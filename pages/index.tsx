@@ -12,6 +12,7 @@ import { FaMoneyCheckAlt } from "react-icons/fa";
 import { RiMoneyDollarCircleFill, RiMoneyRupeeCircleFill } from "react-icons/ri";
 import { LiaMoneyCheckAltSolid } from "react-icons/lia";
 
+// TODO: Refactor the code and split into components
 
 // Interface 
 interface SidebarButtons {
