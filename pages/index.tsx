@@ -1,6 +1,6 @@
 import { BsBookmark, BsTwitter } from "react-icons/bs";
 import React, { useCallback } from "react";
-import {BiHomeCircle, BiUser } from "react-icons/bi";
+import { BiHomeCircle, BiUser } from "react-icons/bi";
 import { LuSearch } from "react-icons/lu";
 import { PiBell } from "react-icons/pi";
 import { MdOutlineMailOutline } from "react-icons/md";
@@ -12,6 +12,9 @@ import { FaMoneyCheckAlt } from "react-icons/fa";
 import { RiMoneyDollarCircleFill, RiMoneyRupeeCircleFill } from "react-icons/ri";
 import { LiaMoneyCheckAltSolid } from "react-icons/lia";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import toast from "react-hot-toast";
+import { graphQLClient } from "@/clients/api";
+import { verifyUserGoogleTokenQuery } from "@/graphql/queries/user";
 
 // TODO: Refactor the code and split into components
 
@@ -29,37 +32,47 @@ const sidebarMenuItems: SidebarButtons[] = [
   },
   {
     title: "Explore",
-    icon : <LuSearch />
+    icon: <LuSearch />
   },
   {
-    title : "Notifications",
-    icon : <PiBell />
+    title: "Notifications",
+    icon: <PiBell />
   },
   {
-    title : "Messeges",
-    icon : <MdOutlineMailOutline />
+    title: "Messeges",
+    icon: <MdOutlineMailOutline />
   },
   {
-    title : "Bookmarks",
-    icon : <BsBookmark />,
+    title: "Bookmarks",
+    icon: <BsBookmark />,
   },
   {
-    title : "Twitter Blue",
-    icon : <RiMoneyDollarCircleFill />
+    title: "Twitter Blue",
+    icon: <RiMoneyDollarCircleFill />
   },
   {
-    title : "Profile",
-    icon : <BiUser />
+    title: "Profile",
+    icon: <BiUser />
   },
   {
-    title : "More",
-    icon : <CiCircleMore />
+    title: "More",
+    icon: <CiCircleMore />
   }
 ];
 
 
 export default function Home() {
-  const handleGoogleLogin = useCallback((cred :CredentialResponse)=> console.log(cred), []);
+  const handleGoogleLogin = useCallback(
+    async (cred: CredentialResponse) => {
+      const googleToken = cred.credential;
+
+      if (!googleToken) return toast.error(`Google Auth Failed`);
+
+      const res = await graphQLClient.request(verifyUserGoogleTokenQuery, { token: googleToken });
+
+      console.log(res);
+      //FIXME:
+    }, []);
 
   return (
     <div>
@@ -67,7 +80,7 @@ export default function Home() {
 
         <div className="col-span-3 pt-1 px-4 pr-16">
           <div className=" text-3xl w-fit hover:bg-gray-700 rounded-full py-2 px-4 cursor-pointer transition-all duration-200 ease-in">
-            <BsTwitter />   
+            <BsTwitter />
           </div>
           <div>
             <ul className="text-xl mt-1 font-normal ">
@@ -84,26 +97,26 @@ export default function Home() {
         </div>
 
         <div className="col-span-5 border-r-[1px] border-l-[1px] border-slate-700">
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
-          <FeedCard/>
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
+          <FeedCard />
         </div>
-        <div className="col-span-4">
-          <GoogleLogin onSuccess={cred => console.log(cred)}/>
+        <div className="col-span-4 p-4">
+          <GoogleLogin onSuccess={handleGoogleLogin} />
         </div>
       </div>
     </div>
