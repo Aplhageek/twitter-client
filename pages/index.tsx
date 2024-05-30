@@ -1,5 +1,5 @@
 import { BsBookmark, BsTwitter } from "react-icons/bs";
-import React from "react";
+import React, { useCallback } from "react";
 import {BiHomeCircle, BiUser } from "react-icons/bi";
 import { LuSearch } from "react-icons/lu";
 import { PiBell } from "react-icons/pi";
@@ -11,6 +11,7 @@ import { CiCircleMore } from "react-icons/ci";
 import { FaMoneyCheckAlt } from "react-icons/fa";
 import { RiMoneyDollarCircleFill, RiMoneyRupeeCircleFill } from "react-icons/ri";
 import { LiaMoneyCheckAltSolid } from "react-icons/lia";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 
 // TODO: Refactor the code and split into components
 
@@ -58,6 +59,8 @@ const sidebarMenuItems: SidebarButtons[] = [
 
 
 export default function Home() {
+  const handleGoogleLogin = useCallback((cred :CredentialResponse)=> console.log(cred), []);
+
   return (
     <div>
       <div className="grid grid-cols-12 h-screen w-screen px-28">
@@ -99,7 +102,9 @@ export default function Home() {
           <FeedCard/>
           <FeedCard/>
         </div>
-        <div className="col-span-4">three</div>
+        <div className="col-span-4">
+          <GoogleLogin onSuccess={cred => console.log(cred)}/>
+        </div>
       </div>
     </div>
   );
