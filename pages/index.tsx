@@ -1,16 +1,13 @@
 import { BsBookmark, BsTwitter } from "react-icons/bs";
 import React, { useCallback } from "react";
-import { BiHomeCircle, BiUser } from "react-icons/bi";
+import { BiUser } from "react-icons/bi";
 import { LuSearch } from "react-icons/lu";
 import { PiBell } from "react-icons/pi";
 import { MdOutlineMailOutline } from "react-icons/md";
 import FeedCard from "@/Components/Layout/FeedCard/FeedCard";
 import { GoHomeFill } from "react-icons/go";
-import { CgMoreO } from "react-icons/cg";
 import { CiCircleMore } from "react-icons/ci";
-import { FaMoneyCheckAlt } from "react-icons/fa";
 import { RiMoneyDollarCircleFill, RiMoneyRupeeCircleFill } from "react-icons/ri";
-import { LiaMoneyCheckAltSolid } from "react-icons/lia";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import { graphQLClient } from "@/clients/api";
@@ -68,10 +65,15 @@ export default function Home() {
 
       if (!googleToken) return toast.error(`Google Auth Failed`);
 
-      const res = await graphQLClient.request(verifyUserGoogleTokenQuery, { token: googleToken });
+      const {verifyGoogleToken} = await graphQLClient.request(verifyUserGoogleTokenQuery, { token: googleToken });
 
-      console.log(res);
-      //FIXME:
+      // console.log(verifyGoogleToken);
+      // save to localstorage
+      if(!verifyGoogleToken) return toast.error("Could not generate token");
+        
+      localStorage.setItem("__twitterToken", verifyGoogleToken);
+      toast.success("Logged in successfully!");
+      return;
     }, []);
 
   return (
