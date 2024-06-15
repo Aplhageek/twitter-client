@@ -12,6 +12,8 @@ import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import { graphQLClient } from "@/clients/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/queries/user";
+import { useCurrentUser } from "@/hooks/user";
+import { useQueryClient } from "@tanstack/react-query";
 
 // TODO: Refactor the code and split into components
 
@@ -59,22 +61,39 @@ const sidebarMenuItems: SidebarButtons[] = [
 
 
 export default function Home() {
+  const { user } = useCurrentUser();
+  const queryClient = useQueryClient();
+
   const handleGoogleLogin = useCallback(
     async (cred: CredentialResponse) => {
-      const googleToken = cred.credential;
+      try {
+        const googleToken = cred.credential;
 
-      if (!googleToken) return toast.error(`Google Auth Failed`);
+        if (!googleToken) return toast.error(`Google Auth Failed`);
 
-      const {verifyGoogleToken} = await graphQLClient.request(verifyUserGoogleTokenQuery, { token: googleToken });
+        console.log(`google token: ${googleToken}`);
 
-      // console.log(verifyGoogleToken);
-      // save to localstorage
-      if(!verifyGoogleToken) return toast.error("Could not generate token");
-        
-      localStorage.setItem("__twitterToken", verifyGoogleToken);
-      toast.success("Logged in successfully!");
-      return;
+        const { verifyGoogleToken } = await graphQLClient.request(verifyUserGoogleTokenQuery, { token: googleToken });
+
+        // console.log(cred);
+
+        // console.log(verifyGoogleToken);
+        // save to localstorage
+        if (!verifyGoogleToken) return toast.error("Could not generate token");
+
+        localStorage.setItem("__twitterToken", verifyGoogleToken);
+        toast.success("Logged in successfully!");
+
+        // force refetching of data to ensure the application has the most up-to-date information.
+        // to get latest data when token is changed.
+        const ann = await queryClient.invalidateQueries({ queryKey: ["curent-user"] });
+
+        return;
+      } catch (err) {
+        console.log(err);
+      }
     }, []);
+  
 
   return (
     <div>
@@ -117,9 +136,10 @@ export default function Home() {
           <FeedCard />
           <FeedCard />
         </div>
-        <div className="col-span-4 p-4">
+
+        {!user && <div className="col-span-4 p-4">
           <GoogleLogin onSuccess={handleGoogleLogin} />
-        </div>
+        </div>}
       </div>
     </div>
   );
