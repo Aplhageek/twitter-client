@@ -16,6 +16,19 @@
   }
 }
 
+html{
+  scrollbar-color: #686868 #424242;
+}
+
+.custom-scrollbar{
+  scrollbar-width: none;
+}
+
+/* .custom-colspan{
+  min-width: 800px;
+  min-width: calc(  ((100vw / 9) *4) - 80px   )   ;
+} */
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
