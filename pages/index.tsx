@@ -16,9 +16,9 @@ import toast from "react-hot-toast";
 import { graphQLClient } from "@/clients/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/queries/user";
 import { useCurrentUser } from "@/hooks/user";
-import { useQueryClient } from "@tanstack/react-query";
+import { Mutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import { useGetAllTweets } from "@/hooks/tweets";
+import { useCreateTweet, useGetAllTweets } from "@/hooks/tweets";
 import { Tweet } from "@/gql/graphql";
 
 // TODO: Refactor the code and split into components
@@ -66,10 +66,19 @@ const sidebarMenuItems: SidebarButtons[] = [
 ];
 
 export default function Home() {
+  const [content, setContent] = useState("");
+
   const { user } = useCurrentUser();
   const { tweets = [] } = useGetAllTweets();  //to have initial value for tweets
+  const { mutate } = useCreateTweet();
 
   const queryClient = useQueryClient();
+
+  const handleCreateTweet = useCallback((content : string) => {
+    // FIXME: Add validation to ensure the consistent behavior
+    mutate({ content });
+    setContent("");
+  }, [mutate]);
 
 
   const handleInputImageForPost = useCallback(() => {
@@ -81,7 +90,6 @@ export default function Home() {
   },
     [],
   )
-
 
   const handleGoogleLogin = useCallback(async (cred: CredentialResponse) => {
     try {
@@ -115,7 +123,7 @@ export default function Home() {
     } catch (err) {
       console.log(err);
     }
-  }, []);
+  }, [queryClient]);
 
   return (
     <div>
@@ -169,7 +177,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* Feedcard */}
+        {/* Feedcard Section */}
         <div className="col-span-6  border-r-[1px] border-l-[1px] border-slate-700 custom-colspan">
           {/* Post input */}
           {user && (
@@ -186,6 +194,8 @@ export default function Home() {
 
               <div className="col-span-11 px-2">
                 <textarea
+                  value={content}
+                  onChange={e => setContent(e.target.value)}
                   name="input"
                   rows={4}
                   className=" bg-transparent w-full custom-scrollbar p-2 h-auto mb-2"
@@ -197,7 +207,9 @@ export default function Home() {
                     onClick={handleInputImageForPost}
                   />
 
-                  <button className=" bg-[#1d9bf0] text-sm px-4 py-2 font-semibold rounded-full  hover:bg-sky-600  transition-all duration-300">
+                  <button
+                    onClick={() => handleCreateTweet(content)}
+                    className=" bg-[#1d9bf0] text-sm px-4 py-2 font-semibold rounded-full  hover:bg-sky-600  transition-all duration-300">
                     Post
                   </button>
                 </div>
@@ -208,7 +220,7 @@ export default function Home() {
 
           {/* tweets */}
           {
-            tweets?.map( (tweet) => < FeedCard key={tweet?.id} data={tweet as Tweet} /> )
+            tweets?.map((tweet) => < FeedCard key={tweet?.id} data={tweet as Tweet} />)
           }
 
         </div>

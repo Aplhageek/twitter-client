@@ -3,6 +3,7 @@ import { CreateTweetData } from "@/gql/graphql";
 import { createTweetMutation } from "@/graphql/mutation/tweet";
 import { getAllTweetsQuery } from "@/graphql/queries/tweets";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import toast from "react-hot-toast";
 
 /**
  * A custom hook that fetches all tweets using a GraphQL query.
@@ -36,9 +37,14 @@ export const useGetAllTweets = () => {
  */
 export const useCreateTweet = () => {
     const queryClient = useQueryClient();
+
     const mutation = useMutation({
         mutationFn: (payload: CreateTweetData) => graphQLClient.request(createTweetMutation, {payload}),
-        onSuccess: () => queryClient.invalidateQueries({queryKey: ["all-tweets"]}), //refetch querries after the success using below query
+        onMutate: () => toast.loading("Posting Tweet", {id : "1"}), //giving matching id so it wont keep loading forever
+        onSuccess: async () => {
+           await queryClient.invalidateQueries({queryKey: ["all-tweets"]}), //refetch querries after the success using below query
+           toast.success("your tweet has been Posted" , {id: "1"});
+        },
     });
 
     return mutation;
