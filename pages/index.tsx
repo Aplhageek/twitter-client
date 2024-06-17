@@ -18,6 +18,8 @@ import { verifyUserGoogleTokenQuery } from "@/graphql/queries/user";
 import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
+import { useGetAllTweets } from "@/hooks/tweets";
+import { Tweet } from "@/gql/graphql";
 
 // TODO: Refactor the code and split into components
 
@@ -65,19 +67,21 @@ const sidebarMenuItems: SidebarButtons[] = [
 
 export default function Home() {
   const { user } = useCurrentUser();
+  const { tweets = [] } = useGetAllTweets();  //to have initial value for tweets
+
   const queryClient = useQueryClient();
 
 
   const handleInputImageForPost = useCallback(() => {
-      // create a new input eleemnt
-      const input = document.createElement("input");
-      input.setAttribute("type", "file");
-      input.setAttribute("accept", "image/*");
-      input.click(); //this allows to open the input modal
-    },
+    // create a new input eleemnt
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click(); //this allows to open the input modal
+  },
     [],
   )
-  
+
 
   const handleGoogleLogin = useCallback(async (cred: CredentialResponse) => {
     try {
@@ -188,36 +192,25 @@ export default function Home() {
                   placeholder="What is happening !"
                 />
                 <div className="actions flex justify-between items-center mb-2 ">
-                  <CiImageOn 
-                  className="text-xl text-[#1D9BF0] hover:text-[#00BA7C] transition-all duration-150 cursor-pointer " 
-                  onClick={handleInputImageForPost}
+                  <CiImageOn
+                    className="text-xl text-[#1D9BF0] hover:text-[#00BA7C] transition-all duration-150 cursor-pointer "
+                    onClick={handleInputImageForPost}
                   />
 
                   <button className=" bg-[#1d9bf0] text-sm px-4 py-2 font-semibold rounded-full  hover:bg-sky-600  transition-all duration-300">
-                      Post
+                    Post
                   </button>
                 </div>
               </div>
 
             </div>
           )}
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
+
+          {/* tweets */}
+          {
+            tweets?.map( (tweet) => < FeedCard key={tweet?.id} data={tweet as Tweet} /> )
+          }
+
         </div>
 
         {/* google login */}
