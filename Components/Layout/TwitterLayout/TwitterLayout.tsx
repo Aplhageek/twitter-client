@@ -111,7 +111,8 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
 
     return (
         <div>
-            <div className="grid grid-cols-12 max-h-screen max-w-screen overflow-hidden mx-1 lg:mx-28">
+            {/* FIXME: Layout shift and scrollbar */}
+            <div className="grid grid-cols-12 max-h-screen max-w-screen mx-1 lg:mx-28">
                 {/* left sidebar */}
 
                 <div className="col-span-2 md:col-span-3 pt-1  sm:pl-4  flex flex-col justify-between max-h-[99vh] sticky top-0">
@@ -202,7 +203,7 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
 
                 {/* Feedcard Section */}
                 {/* you can update the md:col-span-6 if incase design suits after google login section  */}
-                <div className="col-span-8 md:col-span-5 border-r-[1px] border-l-[1px] border-slate-700 custom-colspan">
+                <div className=" col-span-10 md:col-span-9 lg:col-span-5 border-r-[1px] border-l-[1px] border-slate-700 custom-colspan">
                     {children}
                 </div>
 

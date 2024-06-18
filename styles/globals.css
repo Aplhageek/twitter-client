@@ -30,17 +30,15 @@
 
 html{
   scrollbar-color: #686868 #424242;
-  max-width: 100vw !;
+  /* max-width: 100vw !; */
+  scrollbar-gutter: stable;
+
 }
 
 .custom-scrollbar{
   scrollbar-width: none;
 }
 
-/* .custom-colspan{
-  min-width: 800px;
-  min-width: calc(  ((100vw / 9) *4) - 80px   )   ;
-} */
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -58,8 +56,3 @@ body {
   }
 }
 
-
-.your-custom-styles{
-  color: red;
-  width: 100%;
-}
