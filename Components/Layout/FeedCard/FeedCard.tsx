@@ -26,7 +26,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
       </div>
       <div className="col-span-11 px-2 ">
         <h6 className='cursor-pointer text-sm font-bold mb-1 '>{data.user?.firstName} {data.user?.lastName}</h6>
-        <p className=' font-light  text-sm'>
+        <p className=' font-light  text-sm overflow-hidden text-wrap'>
           {data.content}
         </p>
 
