@@ -65,6 +65,8 @@ const sidebarMenuItems: SidebarButtons[] = [
 const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
     const { user } = useCurrentUser();
 
+    console.log(user);
+
     const queryClient = useQueryClient();
 
 
@@ -105,10 +107,6 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
             console.log(err);
         }
     }, [queryClient]);
-
-
-
-
 
 
     return (
@@ -210,7 +208,7 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
 
                 {/* google login */}
                 {!user && (
-                    <div className="col-span-3 p-4">
+                    <div className="hidden md:block md:col-span-4 p-4 ml-10 lg:ml-20">
                         <GoogleLogin onSuccess={handleGoogleLogin} />
                     </div>
                 )}
