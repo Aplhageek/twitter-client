@@ -112,7 +112,7 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
     return (
         <div>
             {/* FIXME: Layout shift and scrollbar */}
-            <div className="grid grid-cols-12 max-h-screen max-w-screen mx-1 lg:mx-28">
+            <div className="grid grid-cols-12 max-h-screen max-w-screen mx-1 sm:mr-10 lg:mx-14 xl:mx-28">
                 {/* left sidebar */}
 
                 <div className="col-span-2 md:col-span-3 pt-1  sm:pl-4  flex flex-col justify-between max-h-[99vh] sticky top-0">
@@ -168,39 +168,6 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
                     )}
                 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 {/* Feedcard Section */}
                 {/* you can update the md:col-span-6 if incase design suits after google login section  */}
                 <div className=" col-span-10 md:col-span-9 lg:col-span-5 border-r-[1px] border-l-[1px] border-slate-700 custom-colspan">
@@ -208,11 +175,14 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
                 </div>
 
                 {/* google login */}
-                {!user && (
-                    <div className="hidden md:block md:col-span-4 p-4 ml-10 lg:ml-20">
-                        <GoogleLogin onSuccess={handleGoogleLogin} />
+
+                <div className="hidden md:block lg:col-span-4 p-4 ml-10 h-fit">
+                    <div className="flex flex-col h-fit m-2">
+                       {!user &&  <GoogleLogin onSuccess={handleGoogleLogin} />}
                     </div>
-                )}
+                </div>
+
+
             </div>
         </div>
     )

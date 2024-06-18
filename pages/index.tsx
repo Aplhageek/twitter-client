@@ -34,6 +34,8 @@ export default function Home() {
     [],
   )
 
+
+  // TODO: Add feAT to make user public private and render feed accordingly
  
 
   return (
