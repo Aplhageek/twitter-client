@@ -17,18 +17,21 @@ const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
     <div className='grid grid-cols-12 border-t border-slate-700 px-5 py-4 pb-1 hover:bg-[#101010] transition-all duration-200'>
       <div className="col-span-1">
         {data.user?.profileImageURL &&
-          <Image
-            className='rounded-full cursor-pointer hover:scale-95 transition-all duration-500 '
-            src={data.user.profileImageURL}
-            alt={data.user.firstName || "user"}
-            width={45}
-            height={45}
-          />}
+          <Link href={data.user?.id as Url}>
+            <Image
+              className='rounded-full cursor-pointer hover:scale-95 transition-all duration-500 '
+              src={data.user.profileImageURL}
+              alt={data.user.firstName || "user"}
+              width={45}
+              height={45}
+            />
+          </Link>
+        }
       </div>
 
       <div className="col-span-11 px-2 ">
 
-        <h6 className=' text-sm font-bold mb-1 '>
+        <h6 className=' text-sm font-bold mb-1 hover:underline'>
           <Link href={data.user?.id as Url}>
             {data.user?.firstName} {data.user?.lastName}
           </Link>

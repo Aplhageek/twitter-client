@@ -1,32 +1,37 @@
 // this is dynamic page
 import TwitterLayout from "@/Components/Layout/TwitterLayout/TwitterLayout";
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import Image from "next/image";
 import {  useGetUserById } from "@/hooks/user";
 import { useRouter } from "next/router";
+import { graphQLClient } from "@/clients/api";
+import { getUserByIdQuery } from "@/graphql/queries/user";
+import { Tweet, User } from "@/gql/graphql";
+import FeedCard from "@/Components/Layout/FeedCard/FeedCard";
 
 
-const UserProfilePage: NextPage = () => {
-  const router = useRouter(); //ths will contain query param with id as our page name is id and it will hold users id
+interface ServerProps {
+  user?: User
+}
 
-  const {user} = useGetUserById(router.query.id as string);
+const UserProfilePage: NextPage<ServerProps> = (props) => {
   
   return (
     <TwitterLayout>
-      {user && <div className="wrapper">
+      {props.user && <div className="wrapper">
         <div className="actions flex gap-6 p-1 ">
           <div className="backarrow rounded-full h-9 w-9 hover:bg-slate-800 flex items-center justify-center cursor-pointer ">
             <IoMdArrowRoundBack className=" rounded-full " />
           </div>
           <div className="user flex flex-col ">
             <h4 className="text-xl font-extrabold tracking-wide">
-              {user.firstName + " " + user.lastName}
+              {props.user.firstName + " " + props.user.lastName}
             </h4>
-            <span className="text-sm text-[#566779]">{`${user.tweets?.length} tweets` }</span>
+            <span className="text-sm text-[#566779]">{`${props.user.tweets?.length} tweets` }</span>
           </div>
         </div>
-        <div className="profileDetails relative border-b-[1px] border-slate-700 mb-2">
+        <div className="profileDetails relative border-b-[1px] border-slate-700">
           {/* TODO: add a fn to add cover pic render conditionaly */}
           <div className="photos">
             <div className="coverImage bg-[#333639] h-[124px] sm:h-[199px] ">
@@ -35,11 +40,11 @@ const UserProfilePage: NextPage = () => {
 
             <div className="profileImage w-16 h-16 relative bottom-9 left-4 -mb-16 cursor-pointer md:w-24 md:h-24 md:bottom-12 md:-mb-24">
               <Image
-                src={user?.profileImageURL as string }
-                alt={user?.firstName ? user.firstName : "user"}
+                src={props.user?.profileImageURL as string }
+                alt={props.user?.firstName ? props.user.firstName : "user"}
                 width={40}
                 height={40}
-                className="h-full w-full rounded-full object-cover border-2 border-black"
+                className="h-full w-full rounded-full object-cover border-2 border-black bg-white"
               />
             </div>
           </div>
@@ -52,7 +57,7 @@ const UserProfilePage: NextPage = () => {
             </div>
             <div className="usernameinfo md:mt-10 ">
               <h2 className=" font-extrabold max-w-[50%] overflow-hidden md:text-[20px]">
-                {user.firstName + " " + user.lastName}
+                {props.user.firstName + " " + props.user.lastName}
               </h2>
 
               {/* TODO: Add scalar type to query on backend to support this 
@@ -77,10 +82,33 @@ const UserProfilePage: NextPage = () => {
           </div>
         </div>
 
-        <div className="feed">Feed</div>
+        <div className="feed">
+          {
+            props.user.tweets?.map((tweet)=> <FeedCard key={tweet?.id} data={tweet as Tweet} /> )
+          }
+        </div>
       </div>}
     </TwitterLayout>
   );
+};
+
+
+export const getServerSideProps: GetServerSideProps<ServerProps> = async (
+  context
+) => {
+  const id = context.query.id as string | undefined;
+
+  if (!id) return { notFound: true, props: { user: undefined } };
+
+  const userInfo = await graphQLClient.request(getUserByIdQuery, { id });
+
+  if (!userInfo?.getUserById) return { notFound: true };
+
+  return {
+    props: {
+      user: userInfo.getUserById as User,
+    },
+  };
 };
 
 export default UserProfilePage;
