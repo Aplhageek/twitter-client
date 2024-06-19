@@ -13,6 +13,7 @@ const UserProfilePage: NextPage = () => {
   const {user} = useGetUserById(router.query.id as string);
 
   console.log(user, "================================================", router.query.id);
+  
   return (
     <TwitterLayout>
       {user && <div className="wrapper">
@@ -24,7 +25,6 @@ const UserProfilePage: NextPage = () => {
             <h4 className="text-xl font-extrabold tracking-wide">
               {user.firstName + " " + user.lastName}
             </h4>
-            {/* FIXME : update query to get tweets of user */}
             <span className="text-sm text-[#566779]">{`${user.tweets?.length} tweets` }</span>
           </div>
         </div>

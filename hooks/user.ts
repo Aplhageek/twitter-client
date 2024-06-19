@@ -21,9 +21,17 @@ export const useCurrentUser = () => {
   };
 };
 
+
+/**
+ * we pass the user-by-id + id of the user to make the query unique so that it will refetch as soon as id changes
+ * 
+ * @param id id of the user
+ * @returns user data
+ * 
+ */
 export const useGetUserById = (id : string) => {
   const query = useQuery({
-    queryKey: ["user-by-id"],
+    queryKey: ["user-by-id", id],
     queryFn: ()=> graphQLClient.request(getUserByIdQuery , {id}),
   });
 
