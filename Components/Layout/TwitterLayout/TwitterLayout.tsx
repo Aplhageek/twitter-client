@@ -23,6 +23,7 @@ interface TwitterLayoutProps {
 interface SidebarButtons {
     title: string;
     icon: React.ReactNode;
+    link: string;
 }
 
 // Data
@@ -30,34 +31,42 @@ const sidebarMenuItems: SidebarButtons[] = [
     {
         title: "Home",
         icon: <GoHomeFill />,
+        link: "/",
     },
     {
         title: "Explore",
         icon: <LuSearch />,
+        link: "/",
     },
     {
         title: "Notifications",
         icon: <PiBell />,
+        link: "/",
     },
     {
         title: "Messeges",
         icon: <MdOutlineMailOutline />,
+        link: "/",
     },
     {
         title: "Bookmarks",
         icon: <BsBookmark />,
+        link: "/",
     },
     {
         title: "Twitter Blue",
         icon: <RiMoneyDollarCircleFill />,
+        link: "/",
     },
     {
         title: "Profile",
         icon: <BiUser />,
+        link: "/",
     },
     {
         title: "More",
         icon: <CiCircleMore />,
+        link: "/",
     },
 ];
 
@@ -112,7 +121,7 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
     return (
         <div>
             {/* FIXME: Layout shift and scrollbar */}
-            <div className="grid grid-cols-12 max-h-screen max-w-screen mx-1 sm:mr-10 lg:mx-14 xl:mx-28">
+            <div className="grid grid-cols-12 max-h-screen max-w-screen  sm:mr-10 lg:mx-14 xl:mx-28">
                 {/* left sidebar */}
 
                 <div className="col-span-2 md:col-span-3 pt-1  sm:pl-4  flex flex-col justify-between max-h-[99vh] sticky top-0">
@@ -170,15 +179,15 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
 
                 {/* Feedcard Section */}
                 {/* you can update the md:col-span-6 if incase design suits after google login section  */}
-                <div className=" col-span-10 md:col-span-9 lg:col-span-5 border-r-[1px] border-l-[1px] border-slate-700 custom-colspan">
+                <div className=" col-span-10 md:col-span-9 lg:col-span-6 border-r-[1px] border-l-[1px] border-slate-700 custom-colspan min-h-screen">
                     {children}
                 </div>
 
                 {/* google login */}
 
-                <div className="hidden md:block lg:col-span-4 p-4 ml-10 h-fit">
+                <div className="hidden bg-slate-400 md:block lg:col-span-3 p-4 ml-10 h-fit">
                     <div className="flex flex-col h-fit m-2">
-                       {!user &&  <GoogleLogin onSuccess={handleGoogleLogin} />}
+                        {!user && <GoogleLogin onSuccess={handleGoogleLogin} />}
                     </div>
                 </div>
 

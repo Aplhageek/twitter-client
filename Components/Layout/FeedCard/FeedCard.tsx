@@ -2,7 +2,6 @@ import React from 'react'
 import Image from 'next/image'
 import { FaRegComment, FaRetweet } from 'react-icons/fa6'
 import { IoIosHeartEmpty } from 'react-icons/io'
-import { GoComment } from 'react-icons/go'
 import { RxUpload } from 'react-icons/rx'
 import { Tweet } from '@/gql/graphql'
 

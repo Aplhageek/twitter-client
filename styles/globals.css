@@ -56,3 +56,9 @@ body {
   }
 }
 
+.half-circle {
+  border-top-left-radius: 100px;
+  border-top-right-radius: 100px;
+  border: 10px solid gray;
+  border-bottom: 0;
+}
