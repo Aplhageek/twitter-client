@@ -11,8 +11,6 @@ const UserProfilePage: NextPage = () => {
   const router = useRouter(); //ths will contain query param with id as our page name is id and it will hold users id
 
   const {user} = useGetUserById(router.query.id as string);
-
-  console.log(user, "================================================", router.query.id);
   
   return (
     <TwitterLayout>
