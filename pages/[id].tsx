@@ -7,7 +7,8 @@ import {  useGetUserById } from "@/hooks/user";
 import { useRouter } from "next/router";
 import { graphQLClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/queries/user";
-import { User } from "@/gql/graphql";
+import { Tweet, User } from "@/gql/graphql";
+import FeedCard from "@/Components/Layout/FeedCard/FeedCard";
 
 
 interface ServerProps {
@@ -30,7 +31,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
             <span className="text-sm text-[#566779]">{`${props.user.tweets?.length} tweets` }</span>
           </div>
         </div>
-        <div className="profileDetails relative border-b-[1px] border-slate-700 mb-2">
+        <div className="profileDetails relative border-b-[1px] border-slate-700">
           {/* TODO: add a fn to add cover pic render conditionaly */}
           <div className="photos">
             <div className="coverImage bg-[#333639] h-[124px] sm:h-[199px] ">
@@ -43,7 +44,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
                 alt={props.user?.firstName ? props.user.firstName : "user"}
                 width={40}
                 height={40}
-                className="h-full w-full rounded-full object-cover border-2 border-black"
+                className="h-full w-full rounded-full object-cover border-2 border-black bg-white"
               />
             </div>
           </div>
@@ -81,7 +82,11 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
           </div>
         </div>
 
-        <div className="feed">Feed</div>
+        <div className="feed">
+          {
+            props.user.tweets?.map((tweet)=> <FeedCard key={tweet?.id} data={tweet as Tweet} /> )
+          }
+        </div>
       </div>}
     </TwitterLayout>
   );
