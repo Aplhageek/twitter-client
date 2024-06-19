@@ -13,6 +13,7 @@ const UserProfilePage: NextPage = () => {
   const { user } = useCurrentUser();
   const router = useRouter(); //ths will contain query param with id as our page name is id and it will hold users id
 
+// FIXME :make this dynamic
 
 
   return (
