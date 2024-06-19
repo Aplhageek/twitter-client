@@ -27,7 +27,7 @@ const UserProfilePage: NextPage = () => {
 
             </div>
 
-            <div className="profileImage w-16 h-16 relative bottom-9 left-4 -mb-16 cursor-pointer ">
+            <div className="profileImage w-16 h-16 relative bottom-9 left-4 -mb-16 cursor-pointer md:w-24 md:h-24 md:bottom-12 md:-mb-24">
               <Image src="https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_640.png"
                 alt="User" width={40} height={40}
                 className="h-full w-full rounded-full object-cover border-2 border-black" />
@@ -38,10 +38,10 @@ const UserProfilePage: NextPage = () => {
             <div className="logoutWrapper h-8 p-1 flex justify-end items-start mb-5">
               <button className=" px-2 rounded-full border py-[2px] border-[#536471] mt-1 hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in" >Logout</button>
             </div>
-            <div className="usernameinfo">
-              <h2 className=" font-extrabold max-w-[50%] overflow-hidden">Jayesh Ahirrao</h2>
+            <div className="usernameinfo md:mt-10 ">
+              <h2 className=" font-extrabold max-w-[50%] overflow-hidden md:text-[20px]">Jayesh Ahirrao</h2>
 
-              <div className="joininginfo text-[10px] text-[#566779] flex items-center gap-1 py-1">
+              <div className="joininginfo text-[10px] text-[#566779] flex items-center gap-1 py-1 md:text-sm">
                 <span className="inline-flex items-center text-sm">
                   <CgCalendarDates />
                 </span>
