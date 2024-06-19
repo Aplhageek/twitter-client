@@ -3,19 +3,16 @@ import TwitterLayout from "@/Components/Layout/TwitterLayout/TwitterLayout";
 import type { NextPage } from "next";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import Image from "next/image";
-import { CgCalendarDates } from "react-icons/cg";
-import { useCurrentUser } from "@/hooks/user";
+import {  useGetUserById } from "@/hooks/user";
 import { useRouter } from "next/router";
 
-const defaultProfileAvatarLink: string = "https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_640.png";
 
 const UserProfilePage: NextPage = () => {
-  const { user } = useCurrentUser();
   const router = useRouter(); //ths will contain query param with id as our page name is id and it will hold users id
 
-// FIXME :make this dynamic
+  const {user} = useGetUserById(router.query.id as string);
 
-
+  console.log(user, "================================================", router.query.id);
   return (
     <TwitterLayout>
       {user && <div className="wrapper">
@@ -28,7 +25,7 @@ const UserProfilePage: NextPage = () => {
               {user.firstName + " " + user.lastName}
             </h4>
             {/* FIXME : update query to get tweets of user */}
-            <span className="text-sm text-[#566779]">{"0 posts"}</span>
+            <span className="text-sm text-[#566779]">{`${user.tweets?.length} tweets` }</span>
           </div>
         </div>
         <div className="profileDetails relative border-b-[1px] border-slate-700 mb-2">
@@ -40,7 +37,7 @@ const UserProfilePage: NextPage = () => {
 
             <div className="profileImage w-16 h-16 relative bottom-9 left-4 -mb-16 cursor-pointer md:w-24 md:h-24 md:bottom-12 md:-mb-24">
               <Image
-                src={user?.profileImageURL ? user.profileImageURL : defaultProfileAvatarLink}
+                src={user?.profileImageURL as string }
                 alt={user?.firstName ? user.firstName : "user"}
                 width={40}
                 height={40}

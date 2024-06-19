@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { use } from 'react'
 import Image from 'next/image'
 import { FaRegComment, FaRetweet } from 'react-icons/fa6'
 import { IoIosHeartEmpty } from 'react-icons/io'
 import { RxUpload } from 'react-icons/rx'
 import { Tweet } from '@/gql/graphql'
+import Link from 'next/link'
+import { Url } from 'next/dist/shared/lib/router/router'
 
 interface FeedCardProps {
   data: Tweet  //codegen creates this type
@@ -23,8 +25,15 @@ const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
             height={45}
           />}
       </div>
+
       <div className="col-span-11 px-2 ">
-        <h6 className='cursor-pointer text-sm font-bold mb-1 '>{data.user?.firstName} {data.user?.lastName}</h6>
+
+        <h6 className=' text-sm font-bold mb-1 '>
+          <Link href={data.user?.id as Url}>
+            {data.user?.firstName} {data.user?.lastName}
+          </Link>
+        </h6>
+
         <p className=' font-light  text-sm overflow-hidden text-wrap'>
           {data.content}
         </p>

@@ -1,5 +1,5 @@
 import { graphQLClient } from "@/clients/api"
-import { getCurrentUserQuery } from "@/graphql/queries/user"
+import { getCurrentUserQuery, getUserByIdQuery } from "@/graphql/queries/user"
 import { useQuery } from "@tanstack/react-query"
 
 /**
@@ -20,3 +20,15 @@ export const useCurrentUser = () => {
       user: query.data?.getCurrentUser, // Extracts the user data, if available
   };
 };
+
+export const useGetUserById = (id : string) => {
+  const query = useQuery({
+    queryKey: ["user-by-id"],
+    queryFn: ()=> graphQLClient.request(getUserByIdQuery , {id}),
+  });
+
+  return {
+    ...query,
+    user: query.data?.getUserById,
+  }
+}
