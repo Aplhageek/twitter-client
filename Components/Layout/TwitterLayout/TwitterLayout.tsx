@@ -3,7 +3,7 @@ import { verifyUserGoogleTokenQuery } from '@/graphql/queries/user';
 import { useCurrentUser } from '@/hooks/user';
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import { useQueryClient } from '@tanstack/react-query';
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import toast from 'react-hot-toast';
 import { BiUser } from 'react-icons/bi';
 import { BsBookmark, BsTwitter } from 'react-icons/bs';
@@ -14,6 +14,7 @@ import { MdOutlineMailOutline } from 'react-icons/md';
 import { PiBell } from 'react-icons/pi';
 import { RiMoneyDollarCircleFill } from 'react-icons/ri';
 import Image from "next/image";
+import Link from 'next/link';
 
 interface TwitterLayoutProps {
     children: React.ReactNode
@@ -27,56 +28,56 @@ interface SidebarButtons {
 }
 
 // Data
-const sidebarMenuItems: SidebarButtons[] = [
-    {
-        title: "Home",
-        icon: <GoHomeFill />,
-        link: "/",
-    },
-    {
-        title: "Explore",
-        icon: <LuSearch />,
-        link: "/",
-    },
-    {
-        title: "Notifications",
-        icon: <PiBell />,
-        link: "/",
-    },
-    {
-        title: "Messeges",
-        icon: <MdOutlineMailOutline />,
-        link: "/",
-    },
-    {
-        title: "Bookmarks",
-        icon: <BsBookmark />,
-        link: "/",
-    },
-    {
-        title: "Twitter Blue",
-        icon: <RiMoneyDollarCircleFill />,
-        link: "/",
-    },
-    {
-        title: "Profile",
-        icon: <BiUser />,
-        link: "/",
-    },
-    {
-        title: "More",
-        icon: <CiCircleMore />,
-        link: "/",
-    },
-];
+
 
 
 const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
     const { user } = useCurrentUser();
 
-    console.log(user);
-
     const queryClient = useQueryClient();
+
+    const sidebarMenuItems: SidebarButtons[] = useMemo(() => [
+        {
+            title: "Home",
+            icon: <GoHomeFill />,
+            link: "/",
+        },
+        {
+            title: "Explore",
+            icon: <LuSearch />,
+            link: "/",
+        },
+        {
+            title: "Notifications",
+            icon: <PiBell />,
+            link: "/",
+        },
+        {
+            title: "Messeges",
+            icon: <MdOutlineMailOutline />,
+            link: "/",
+        },
+        {
+            title: "Bookmarks",
+            icon: <BsBookmark />,
+            link: "/",
+        },
+        {
+            title: "Twitter Blue",
+            icon: <RiMoneyDollarCircleFill />,
+            link: "/",
+        },
+        {
+            title: "Profile",
+            icon: <BiUser />,
+            link: `/${user?.id}`,
+        },
+        {
+            title: "More",
+            icon: <CiCircleMore />,
+            link: "/",
+        },
+    ], [user?.id])
 
 
 
@@ -89,16 +90,13 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
 
             if (!googleToken) return toast.error(`Google Auth Failed`);
 
-            console.log(`google token: ${googleToken}`);
 
             const { verifyGoogleToken } = await graphQLClient.request(
                 verifyUserGoogleTokenQuery,
                 { token: googleToken }
             );
 
-            // console.log(cred);
 
-            // console.log(verifyGoogleToken);
             // save to localstorage
             if (!verifyGoogleToken) return toast.error("Could not generate token");
 
@@ -137,13 +135,15 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
                             {/* Adjust max-height as needed */}
                             <ul className="text-sm xl:text-xl font-normal flex flex-col">
                                 {sidebarMenuItems.map((item) => (
-                                    <li
-                                        className="flex justify-start items-center gap-4 hover:bg-gray-800 rounded-full cursor-pointer transition-all duration-200 ease-in px-4 py-2 md:py-3 pr-6 my-1 w-fit "
-                                        key={item.title}
-                                    >
-                                        <span className="text-2xl lg:text-3xl ">{item.icon}</span>
-                                        <span className=" hidden md:inline" >{item.title}</span>
-                                    </li>
+                                    <Link href={item.link} key={item.title}>
+                                        <li
+                                            className="flex justify-start items-center gap-4 hover:bg-gray-800 rounded-full cursor-pointer transition-all duration-200 ease-in px-4 py-2 md:py-3 pr-6 my-1 w-fit "
+                                            key={item.title}
+                                        >
+                                            <span className="text-2xl lg:text-3xl ">{item.icon}</span>
+                                            <span className=" hidden md:inline" >{item.title}</span>
+                                        </li>
+                                    </Link>
                                 ))}
                             </ul>
                         </div>
@@ -190,7 +190,6 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
                         {!user && <GoogleLogin onSuccess={handleGoogleLogin} />}
                     </div>
                 </div>
-
 
             </div>
         </div>
