@@ -1,6 +1,7 @@
 import { graphql } from "../../gql";
 // TODO: Add scalar type of date
 
+
 export const verifyUserGoogleTokenQuery = graphql(`
   #graphql
   query VerifyUserGoogleToken($token: String!) {
@@ -13,34 +14,36 @@ export const getCurrentUserQuery = graphql(`
     getCurrentUser {
       id
       profileImageURL
+      email
       firstName
       lastName
-      tweets{
+      tweets {
         id
         content
         imageURL
-        user{
+        user {
           id
-          profileImageURL
           firstName
           lastName
+          profileImageURL
         }
       }
     }
   }
 `);
 
-export const getUserByIdQuery = graphql(
-`#graphql
-  query GetUserById($id: ID!) {
-    getUserById(id : $id) {
-    firstName
-    lastName
-    id
-    profileImageURL
+
+export const getUserByIdQuery = graphql(`
+  #graphql
+  query GetuserById($id: ID!) {
+    getUserById(id: $id) {
+      id
+      firstName
+      lastName
+      profileImageURL
       tweets {
-        id
         content
+        id
         imageURL
         user {
           id
