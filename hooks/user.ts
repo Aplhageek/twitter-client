@@ -1,5 +1,5 @@
 import { graphQLClient } from "@/clients/api"
-import { getCurrentUserQuery, getUserByIdQuery } from "@/graphql/queries/user"
+import { getCurrentUserQuery, getUserByIdQuery, } from "@/graphql/queries/user"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react";
 
@@ -39,7 +39,7 @@ export const useGetUserById = (id: string) => {
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ["user-by-id"] });
-  }, [id]);
+  }, [id, queryClient]);
 
   return {
     ...query,
