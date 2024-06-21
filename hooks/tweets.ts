@@ -39,11 +39,11 @@ export const useCreateTweet = () => {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: (payload: CreateTweetData) => graphQLClient.request(createTweetMutation, {payload}),
-        onMutate: () => toast.loading("Posting Tweet", {id : "1"}), //giving matching id so it wont keep loading forever
+        mutationFn: (payload: CreateTweetData) => graphQLClient.request(createTweetMutation, { payload }),
+        onMutate: () => toast.loading("Posting Tweet", { id: "1" }), //giving matching id so it wont keep loading forever
         onSuccess: async () => {
-           await queryClient.invalidateQueries({queryKey: ["all-tweets"]}), //refetch querries after the success using below query
-           toast.success("your tweet has been Posted" , {id: "1"});
+            await queryClient.invalidateQueries({ queryKey: ["all-tweets"] }), //refetch querries after the success using below query
+                toast.success("your tweet has been Posted", { id: "1", duration: 1200 });
         },
     });
 
