@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import FeedCard from "@/Components/Layout/FeedCard/FeedCard";
 import { CiImageOn } from "react-icons/ci";
 import { useCurrentUser } from "@/hooks/user";
@@ -20,22 +20,62 @@ interface HomeProps {
   tweets: Tweet[];
 }
 
+interface InputFileRef {
+  currFile: File
+  imageType: string,
+}
+
 const Home: React.FC<HomeProps> = (props) => {
 
   const [content, setContent] = useState("");
   const [localTweetImagURL, setLocalTweetImageURL] = useState<string | null>(null);
-  const [s3ImageURL, setS3ImageURL] = useState<string | null>(null);
+
+  const signedURLRef = useRef<string | null>(null);
+  const inputFileRef = useRef<InputFileRef | null>();
+
 
   const { user } = useCurrentUser();
   const { tweets = [] } = useGetAllTweets();  //to have initial value for tweets
   const { mutate } = useCreateTweet();
 
+  const uploadImageToS3 = useCallback(async (mySignedURL: string | null, file: InputFileRef | null| undefined) => {
+    if (mySignedURL && file) {
+      try {
+        toast.loading("Uploading image...", { id: "1" });
+        const something = await axios.put(mySignedURL, file.currFile, { headers: { "Content-Type": file.imageType } });
+        toast.success("Image uploaded...", { id: "1"});
+        const url = new URL(mySignedURL);
+        const s3ImagePath = `${url.origin}${url.pathname}`
+        return s3ImagePath;
+      } catch (error) {
+        return null;
+      }
+    }
+    else {
+      return null;
+    }
+  }, []);
 
-  const handleCreateTweet = useCallback((content: string) => {
-    // FIXME: Add validation to ensure the consistent behavior
-    mutate({ content , imageURL: s3ImageURL });
+
+  const handleCreateTweet = useCallback(async (content: string) => {
+    // // FIXME: Add validation to ensure the consistent behavior
+    let s3ImagePath = null;
+
+    if(localTweetImagURL){
+      if(inputFileRef.current) {
+        s3ImagePath = await uploadImageToS3(signedURLRef.current, inputFileRef.current);
+      }
+      if (!s3ImagePath) {
+        toast.error("Error uploading image 😭");
+        return;
+      }
+    }
+    
+    mutate({ content, imageURL: s3ImagePath });
+
     setContent("");
-  }, [mutate, s3ImageURL]);
+    setLocalTweetImageURL(null);
+  }, [localTweetImagURL, mutate, uploadImageToS3]);
 
   /**
    * - 1. generate file url on client
@@ -46,24 +86,31 @@ const Home: React.FC<HomeProps> = (props) => {
   const handleFileChange = useCallback((input: HTMLInputElement) => {
     return async (event: Event) => {
       if (input.files?.length) {
+        // part 1:
         const currFile = input.files[0];
         const imageType = currFile.type.split("/")[1];
         const link = URL.createObjectURL(currFile);
         setLocalTweetImageURL(link);
+        inputFileRef.current = {
+          currFile,
+          imageType,
+        };
 
-        const {getSignedURLForTweet : mySignedURL} = await graphQLClient.request(getSignedURLForTweetQuery, { imageName: currFile.name, imageType });
+        // Step 2: get signed url if success then only go ahead
+        try {
+          toast.loading("Getting it ready...", { id: "1000" });
+          const { getSignedURLForTweet: mySignedURL } = await graphQLClient.request(getSignedURLForTweetQuery, { imageName: currFile.name, imageType });
 
-        if (mySignedURL) {
-          try {
-            toast.loading("Uploading image...", { id: "1" });
-            const something = await axios.put(mySignedURL, currFile, { headers: { "Content-Type": currFile.type } });
-            toast.success("Image uploaded...", { id: "1" });
-            const url = new URL(mySignedURL);
-            const s3ImagePath = `${url.origin}${url.pathname}`
-            setS3ImageURL(s3ImagePath);
-          } catch (error) {
-            toast.error("Error uploading image");
+          if (!mySignedURL) {
+            toast.error("couldn't get signed url", { id: "1000" });
+            return;
+          } else {
+            toast.success("Ready to upload!", { id: "1000" });
+            signedURLRef.current = mySignedURL;
           }
+        } catch (error) {
+          toast.error("couldn't get signed url", { id: "signedURL" });
+          return;
         }
       } else {
         toast.error("Image upload failed!");
@@ -71,7 +118,7 @@ const Home: React.FC<HomeProps> = (props) => {
     }
   }, []);
 
-  console.log("S3 ===>>" ,s3ImageURL);
+
 
 
   const handleInputImageForPost = useCallback(() => {
@@ -117,8 +164,8 @@ const Home: React.FC<HomeProps> = (props) => {
                 placeholder="What is happening !"
               />
               <div className="inputImage pr-4 mb-8 ">
-                {localTweetImagURL &&
-                  <Image src={localTweetImagURL} alt="img" height={100} width={100} className="w-full" />
+                {localTweetImagURL && 
+                  <Image src={localTweetImagURL} alt="img" height={1000} width={1000} className="w-full" />
                 }
               </div>
 
@@ -139,10 +186,10 @@ const Home: React.FC<HomeProps> = (props) => {
           </div>
         )}
 
-      {/* tweets */}
-      {
-        props.tweets?.map((tweet) => < FeedCard key={tweet?.id} data={tweet as Tweet} />)
-      }
+        {/* tweets */}
+        {
+          props.tweets?.map((tweet) => < FeedCard key={tweet?.id} data={tweet as Tweet} />)
+        }
 
       </TwitterLayout>
     </div>
@@ -150,12 +197,12 @@ const Home: React.FC<HomeProps> = (props) => {
 }
 
 
-export const getServerSideProps : GetServerSideProps<HomeProps> = async (context) => {
+export const getServerSideProps: GetServerSideProps<HomeProps> = async (context) => {
   const allTweets = await graphQLClient.request(getAllTweetsQuery);
 
   return {
     props: {
-      tweets : allTweets?.getAllTweets as Tweet[],
+      tweets: allTweets?.getAllTweets as Tweet[],
     }
   }
 }
