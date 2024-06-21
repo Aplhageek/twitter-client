@@ -10,11 +10,18 @@ import { IoCloseCircle } from "react-icons/io5";
 import toast from "react-hot-toast";
 import { graphQLClient } from "@/clients/api";
 import axios from "axios";
+import { GetServerSideProps } from "next";
+import { graphql } from "@/gql";
+import { getAllTweetsQuery } from "@/graphql/queries/tweets";
 
 // TODO: Refactor the code and split into components
 
+interface HomeProps {
+  tweets: Tweet[];
+}
 
-export default function Home() {
+const Home: React.FC<HomeProps> = (props) => {
+
   const [content, setContent] = useState("");
   const [tweetImageURL, setTweetImageURL] = useState<string | null>(null);
   const [s3ImageURL, setS3ImageURL] = useState<string | null>(null);
@@ -131,12 +138,26 @@ export default function Home() {
           </div>
         )}
 
-        {/* tweets */}
-        {
-          tweets?.map((tweet) => < FeedCard key={tweet?.id} data={tweet as Tweet} />)
-        }
+      {/* tweets */}
+      {
+        props.tweets?.map((tweet) => < FeedCard key={tweet?.id} data={tweet as Tweet} />)
+      }
 
       </TwitterLayout>
     </div>
   );
 }
+
+
+export const getServerSideProps : GetServerSideProps<HomeProps> = async (context) => {
+  const allTweets = await graphQLClient.request(getAllTweetsQuery);
+
+  return {
+    props: {
+      tweets : allTweets?.getAllTweets as Tweet[],
+    }
+  }
+}
+
+
+export default Home;

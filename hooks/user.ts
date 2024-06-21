@@ -12,29 +12,34 @@ import { useEffect } from "react";
  */
 export const useCurrentUser = () => {
   const query = useQuery({
-      queryKey: ["current-user"], // Unique identifier for the query
-      queryFn: () => graphQLClient.request(getCurrentUserQuery), // Fetches data using the GraphQL client
+    queryKey: ["current-user"], // Unique identifier for the query
+    queryFn: () => graphQLClient.request(getCurrentUserQuery), // Fetches data using the GraphQL client
   });
 
   return {
     ...query, // Spreads the properties of the query object
-      user: query.data?.getCurrentUser, // Extracts the user data, if available
+    user: query.data?.getCurrentUser, // Extracts the user data, if available
   };
 };
 
 
 /**
- * we pass the user-by-id + id of the user to make the query unique so that it will refetch as soon as id changes
+ * whenever we get new id, we fetch the latest data
  * 
  * @param id id of the user
  * @returns user data
  * 
  */
-export const useGetUserById = (id : string) => {
+export const useGetUserById = (id: string) => {
+  const queryClient = useQueryClient();
   const query = useQuery({
-    queryKey: ["user-by-id", id],
-    queryFn: ()=> graphQLClient.request(getUserByIdQuery , {id}),
+    queryKey: ["user-by-id"],
+    queryFn: () => graphQLClient.request(getUserByIdQuery, { id }),
   });
+
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["user-by-id"] });
+  }, [id]);
 
   return {
     ...query,
