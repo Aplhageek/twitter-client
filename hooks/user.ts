@@ -1,6 +1,7 @@
 import { graphQLClient } from "@/clients/api"
 import { getCurrentUserQuery, getUserByIdQuery } from "@/graphql/queries/user"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useEffect } from "react";
 
 /**
  * -  inorder for this to work wrap the app component inside querrycliendProvider

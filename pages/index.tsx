@@ -7,6 +7,9 @@ import { useCreateTweet, useGetAllTweets } from "@/hooks/tweets";
 import { Tweet } from "@/gql/graphql";
 import TwitterLayout from "@/Components/Layout/TwitterLayout/TwitterLayout";
 import { IoCloseCircle } from "react-icons/io5";
+import toast from "react-hot-toast";
+import { graphQLClient } from "@/clients/api";
+import axios from "axios";
 
 // TODO: Refactor the code and split into components
 
@@ -14,6 +17,7 @@ import { IoCloseCircle } from "react-icons/io5";
 export default function Home() {
   const [content, setContent] = useState("");
   const [tweetImageURL, setTweetImageURL] = useState<string | null>(null);
+  const [s3ImageURL, setS3ImageURL] = useState<string | null>(null);
 
   const { user } = useCurrentUser();
   const { tweets = [] } = useGetAllTweets();  //to have initial value for tweets
@@ -22,9 +26,44 @@ export default function Home() {
 
   const handleCreateTweet = useCallback((content: string) => {
     // FIXME: Add validation to ensure the consistent behavior
-    mutate({ content });
+    mutate({ content});
     setContent("");
   }, [mutate]);
+
+  /**
+   * - 1. generate file url on client
+   * - 2. request the presigned URL
+   * - 3. upload the image
+   * - 4. uplaod the tweet 
+   */
+  const handleFileChange = useCallback((input: HTMLInputElement) => {
+    return async (event: Event) => {
+      if (input.files?.length) {
+        const currFile = input.files[0];
+        const imageType = currFile.type.split("/")[1];
+        const link = URL.createObjectURL(currFile);
+        setTweetImageURL(link);
+
+        // const { getSignedURLForTweetImage: signedURL } = await graphQLClient.request(getSignedURLForTweetsQuery, { imageName: currFile.name, imageType });
+
+        // if (signedURL) {
+        //   try {
+        //     toast.loading("Uploading image...", { id: "1" });
+        //     const something = await axios.put(signedURL, currFile, { headers: { "Content-Type": currFile.type } });
+        //     toast.success("Image uploaded...", { id: "1" });
+        //     const url = new URL(signedURL);
+        //     const s3ImagePath = `${url.origin}${url.pathname}`
+        //     setS3ImageURL(s3ImagePath);
+        //   } catch (error) {
+        //     toast.error("Error uploading image");
+        //   }
+        // }
+
+      } else {
+        toast.error("Image upload failed!");
+      }
+    }
+  }, [])
 
 
   const handleInputImageForPost = useCallback(() => {
@@ -33,18 +72,11 @@ export default function Home() {
     input.setAttribute("type", "file");
     input.setAttribute("accept", "image/png, image/jpeg, image/jpg , image/webp");
 
-    input.addEventListener('change', () => {
-      console.log(input.files)
-      if (input.files?.length) {
-        const currFile = input.files[0];
-        const imageType = currFile.type.split("/")[1];
-        const link = URL.createObjectURL(currFile);
-        setTweetImageURL(link);
-      }
-    });
-    input.click(); // This allows to open the input modal
-  }, []);
+    const handlerFn = handleFileChange(input);
 
+    input.addEventListener('change', handlerFn);
+    input.click(); // This allows to open the input modal
+  }, [handleFileChange]);
 
 
 

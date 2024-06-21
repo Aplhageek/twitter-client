@@ -16,4 +16,11 @@ export const getAllTweetsQuery = graphql(`
     }    
 `);
 
+// export const getSignedURLForTweetsQuery = graphql(`#graphql
+//     query GetSignedURL($imageName: String!, $imageType: String!) {
+//         getSignedURLForTweetImage(imageName: $imageName, imageType: $imageType)
+//     }
+
+// `)
+
 // always remeber to generate the types using codegen by ==>> yarn codegen 
