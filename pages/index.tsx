@@ -38,12 +38,12 @@ const Home: React.FC<HomeProps> = (props) => {
   const { tweets = [] } = useGetAllTweets();  //to have initial value for tweets
   const { mutate } = useCreateTweet();
 
-  const uploadImageToS3 = useCallback(async (mySignedURL: string | null, file: InputFileRef | null| undefined) => {
+  const uploadImageToS3 = useCallback(async (mySignedURL: string | null, file: InputFileRef | null | undefined) => {
     if (mySignedURL && file) {
       try {
         toast.loading("Uploading image...", { id: "1" });
         const something = await axios.put(mySignedURL, file.currFile, { headers: { "Content-Type": file.imageType } });
-        toast.success("Image uploaded...", { id: "1"});
+        toast.success("Image uploaded...", { id: "1" });
         const url = new URL(mySignedURL);
         const s3ImagePath = `${url.origin}${url.pathname}`
         return s3ImagePath;
@@ -56,13 +56,12 @@ const Home: React.FC<HomeProps> = (props) => {
     }
   }, []);
 
-
   const handleCreateTweet = useCallback(async (content: string) => {
     // // FIXME: Add validation to ensure the consistent behavior
     let s3ImagePath = null;
 
-    if(localTweetImagURL){
-      if(inputFileRef.current) {
+    if (localTweetImagURL) {
+      if (inputFileRef.current) {
         s3ImagePath = await uploadImageToS3(signedURLRef.current, inputFileRef.current);
       }
       if (!s3ImagePath) {
@@ -70,7 +69,7 @@ const Home: React.FC<HomeProps> = (props) => {
         return;
       }
     }
-    
+
     mutate({ content, imageURL: s3ImagePath });
 
     setContent("");
@@ -134,6 +133,12 @@ const Home: React.FC<HomeProps> = (props) => {
   }, [handleFileChange]);
 
 
+  const handleCancelImage = useCallback((event: React.MouseEvent<SVGElement, MouseEvent>) => {
+    setLocalTweetImageURL(null);
+    signedURLRef.current = null;
+    inputFileRef.current = null;
+  },[]);
+
 
   // TODO: Add feAT to make user public private and render feed accordingly
 
@@ -163,9 +168,12 @@ const Home: React.FC<HomeProps> = (props) => {
                 className=" bg-transparent w-full custom-scrollbar p-2 h-auto mb-2"
                 placeholder="What is happening !"
               />
-              <div className="inputImage pr-4 mb-8 ">
-                {localTweetImagURL && 
-                  <Image src={localTweetImagURL} alt="img" height={1000} width={1000} className="w-full" />
+              <div className="inputImage pr-4 mb-8 relative ">
+                {localTweetImagURL &&
+                  <>
+                    <Image src={localTweetImagURL} alt='img' width={1000} height={1000} className='w-full' />
+                    <IoCloseCircle onClick={handleCancelImage} className="text-xl absolute z-10 -top-3 right-1 cursor-pointer hover:text-red-400 transition-all duration-500 ease-out" />
+                  </>
                 }
               </div>
 

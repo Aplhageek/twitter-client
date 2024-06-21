@@ -9,7 +9,6 @@ import { Url } from 'next/dist/shared/lib/router/router'
 
 interface FeedCardProps {
   data: Tweet  //codegen creates this type
-  // key : string | undefined 
 }
 
 const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
