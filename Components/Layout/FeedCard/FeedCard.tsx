@@ -22,8 +22,8 @@ const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
               className='rounded-full cursor-pointer hover:scale-95 transition-all duration-500 '
               src={data.user.profileImageURL}
               alt={data.user.firstName || "user"}
-              width={45}
-              height={45}
+              width={500}
+              height={500}
             />
           </Link>
         }
@@ -40,6 +40,9 @@ const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
         <p className=' font-light  text-sm overflow-hidden text-wrap'>
           {data.content}
         </p>
+        <div className="imag">
+         { data.imageURL && <Image src={data.imageURL} alt='img' width={1000} height={1000} className='w-full' />}
+        </div>
 
         <div className="action-btns mt-3">
           <div className='  flex justify-between my-1  w-[90%] text-lg'  >

@@ -165,8 +165,8 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
                                     className="rounded-full min-w-[30px] max-w-[30px] md:min-w-[50px]"
                                     src={user.profileImageURL}
                                     alt={user.firstName}
-                                    height={50}
-                                    width={50}
+                                    height={1000}
+                                    width={1000}
                                 />
                             )}
 

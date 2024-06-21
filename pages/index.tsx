@@ -12,7 +12,7 @@ import { graphQLClient } from "@/clients/api";
 import axios from "axios";
 import { GetServerSideProps } from "next";
 import { graphql } from "@/gql";
-import { getAllTweetsQuery } from "@/graphql/queries/tweets";
+import { getAllTweetsQuery, getSignedURLForTweetQuery } from "@/graphql/queries/tweets";
 
 // TODO: Refactor the code and split into components
 
@@ -23,7 +23,7 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = (props) => {
 
   const [content, setContent] = useState("");
-  const [tweetImageURL, setTweetImageURL] = useState<string | null>(null);
+  const [localTweetImagURL, setLocalTweetImageURL] = useState<string | null>(null);
   const [s3ImageURL, setS3ImageURL] = useState<string | null>(null);
 
   const { user } = useCurrentUser();
@@ -33,9 +33,9 @@ const Home: React.FC<HomeProps> = (props) => {
 
   const handleCreateTweet = useCallback((content: string) => {
     // FIXME: Add validation to ensure the consistent behavior
-    mutate({ content});
+    mutate({ content , imageURL: s3ImageURL });
     setContent("");
-  }, [mutate]);
+  }, [mutate, s3ImageURL]);
 
   /**
    * - 1. generate file url on client
@@ -49,28 +49,29 @@ const Home: React.FC<HomeProps> = (props) => {
         const currFile = input.files[0];
         const imageType = currFile.type.split("/")[1];
         const link = URL.createObjectURL(currFile);
-        setTweetImageURL(link);
+        setLocalTweetImageURL(link);
 
-        // const { getSignedURLForTweetImage: signedURL } = await graphQLClient.request(getSignedURLForTweetsQuery, { imageName: currFile.name, imageType });
+        const {getSignedURLForTweet : mySignedURL} = await graphQLClient.request(getSignedURLForTweetQuery, { imageName: currFile.name, imageType });
 
-        // if (signedURL) {
-        //   try {
-        //     toast.loading("Uploading image...", { id: "1" });
-        //     const something = await axios.put(signedURL, currFile, { headers: { "Content-Type": currFile.type } });
-        //     toast.success("Image uploaded...", { id: "1" });
-        //     const url = new URL(signedURL);
-        //     const s3ImagePath = `${url.origin}${url.pathname}`
-        //     setS3ImageURL(s3ImagePath);
-        //   } catch (error) {
-        //     toast.error("Error uploading image");
-        //   }
-        // }
-
+        if (mySignedURL) {
+          try {
+            toast.loading("Uploading image...", { id: "1" });
+            const something = await axios.put(mySignedURL, currFile, { headers: { "Content-Type": currFile.type } });
+            toast.success("Image uploaded...", { id: "1" });
+            const url = new URL(mySignedURL);
+            const s3ImagePath = `${url.origin}${url.pathname}`
+            setS3ImageURL(s3ImagePath);
+          } catch (error) {
+            toast.error("Error uploading image");
+          }
+        }
       } else {
         toast.error("Image upload failed!");
       }
     }
-  }, [])
+  }, []);
+
+  console.log("S3 ===>>" ,s3ImageURL);
 
 
   const handleInputImageForPost = useCallback(() => {
@@ -101,8 +102,8 @@ const Home: React.FC<HomeProps> = (props) => {
                 className="rounded-full cursor-pointer hover:scale-95 transition-all duration-500 "
                 src={user?.profileImageURL || ""}
                 alt={user?.firstName}
-                width={50}
-                height={50}
+                width={1000}
+                height={1000}
               />
             </div>
 
@@ -116,8 +117,8 @@ const Home: React.FC<HomeProps> = (props) => {
                 placeholder="What is happening !"
               />
               <div className="inputImage pr-4 mb-8 ">
-                {tweetImageURL &&
-                  <Image src={tweetImageURL} alt="img" height={100} width={100} className="w-full" />
+                {localTweetImagURL &&
+                  <Image src={localTweetImagURL} alt="img" height={100} width={100} className="w-full" />
                 }
               </div>
 

@@ -42,8 +42,8 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
               <Image
                 src={props.user?.profileImageURL as string }
                 alt={props.user?.firstName ? props.user.firstName : "user"}
-                width={40}
-                height={40}
+                width={1000}
+                height={1000}
                 className="h-full w-full rounded-full object-cover border-2 border-black bg-white"
               />
             </div>
