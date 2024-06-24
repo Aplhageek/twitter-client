@@ -35,7 +35,7 @@ const Home: React.FC<HomeProps> = (props) => {
 
 
   const { user } = useCurrentUser();
-  const { tweets = [] } = useGetAllTweets();  //to have initial value for tweets
+  const { tweets = props.tweets as Tweet[] } = useGetAllTweets();  //to have initial value for tweets
   const { mutate } = useCreateTweet();
 
   const uploadImageToS3 = useCallback(async (mySignedURL: string | null, file: InputFileRef | null | undefined) => {
@@ -196,7 +196,7 @@ const Home: React.FC<HomeProps> = (props) => {
 
         {/* tweets */}
         {
-          props.tweets?.map((tweet) => < FeedCard key={tweet?.id} data={tweet as Tweet} />)
+          tweets?.map((tweet) => < FeedCard key={tweet?.id} data={tweet as Tweet} />)
         }
 
       </TwitterLayout>
