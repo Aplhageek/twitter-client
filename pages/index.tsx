@@ -133,7 +133,7 @@ const Home: React.FC<HomeProps> = (props) => {
   }, [handleFileChange]);
 
 
-  const handleCancelImage = useCallback((event: React.MouseEvent<SVGElement, MouseEvent>) => {
+  const handleCancelImage = useCallback(() => {
     setLocalTweetImageURL(null);
     signedURLRef.current = null;
     inputFileRef.current = null;
