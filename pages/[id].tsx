@@ -9,7 +9,10 @@ import { graphQLClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/queries/user";
 import { Tweet, User } from "@/gql/graphql";
 import FeedCard from "@/Components/Layout/FeedCard/FeedCard";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import toast from "react-hot-toast";
+import { followUserMutation } from "@/graphql/mutation/user";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 interface ServerProps {
@@ -18,8 +21,10 @@ interface ServerProps {
 
 const UserProfilePage: NextPage<ServerProps> = (props) => {
   const { user } = useCurrentUser();
+  const queryClient = useQueryClient();
 
   const amIFollowing = useMemo(() => {
+    // TODO: remove this to simple logic if even after resolving stale data of SSR is not updating 
     if (!user || !user.followings) return false;
     if (!props.user || !props.user.followers) return false;
 
@@ -34,6 +39,18 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
     }
   }, [props.user, user]);
 
+
+  const handleFollowUser = useCallback( async ()=> {
+    if(!props.user) return toast.error("something went wrong");
+
+    await graphQLClient.request(followUserMutation, {to: props.user.id});
+    await queryClient.invalidateQueries( { queryKey : ["current-user"] });
+    toast.success(`Following ${props.user.firstName} now`);
+  } ,[props.user, queryClient]); 
+
+  function handleUnfollowUser(event: Event): void {
+    toast.success("Implimentation is in progress");
+  }
 
   return (
     <TwitterLayout>
@@ -75,10 +92,14 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
                 </button> :
                 (
                   amIFollowing ?
-                    <button className=" text-[#0F1419] bg-[#eff3f4] px-2 rounded-full border-[2px] py-[4px] mt-1 hover:scale-105 cursor-pointer transition-all duration-200 ease-in text-sm md:text-sm lg:text-base font-bold">
+                    <button
+                    // onClick={handleUnfollowUser}   
+                    className=" text-[#0F1419] bg-[#eff3f4] px-2 rounded-full border-[2px] py-[4px] mt-1 hover:scale-105 cursor-pointer transition-all duration-200 ease-in text-sm md:text-sm lg:text-base font-bold">
                       Unfollow
                     </button> :
-                    <button className=" text-[#0F1419] bg-[#eff3f4] px-2 rounded-full border-[2px] py-[4px] mt-1 hover:scale-105 cursor-pointer transition-all duration-200 ease-in text-sm md:text-sm lg:text-base font-bold">
+                    <button 
+                    onClick={handleFollowUser} 
+                    className=" text-[#0F1419] bg-[#eff3f4] px-2 rounded-full border-[2px] py-[4px] mt-1 hover:scale-105 cursor-pointer transition-all duration-200 ease-in text-sm md:text-sm lg:text-base font-bold">
                       Follow
                     </button>
                 )

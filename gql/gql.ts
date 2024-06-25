@@ -14,6 +14,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n    mutation CreateTweet($payload: CreateTweetData!) {\n        createTweet(payload : $payload){\n            id\n        }\n    }\n": types.CreateTweetDocument,
+    "#graphql\n    mutation FollowUser($to: ID!) {\n        followUser(to: $to)\n    } \n": types.FollowUserDocument,
+    "#graphql\n    mutation UnfollowUser($to: ID!) {\n        unfollowUser(to: $to)\n    }\n": types.UnfollowUserDocument,
     "\n    query getAllTweets {\n        getAllTweets{\n            id\n            content\n            imageURL\n            user {\n                id\n                profileImageURL\n                firstName\n                lastName\n            }\n        }\n    }    \n": types.GetAllTweetsDocument,
     "\n    query GetSignedURL($imageName: String!, $imageType: String!) {\n      getSignedURLForTweet(imageName: $imageName, imageType: $imageType)\n    }\n": types.GetSignedUrlDocument,
     "\n  #graphql\n  query VerifyUserGoogleToken($token: String!) {\n    verifyGoogleToken(token: $token)\n  }\n": types.VerifyUserGoogleTokenDocument,
@@ -39,6 +41,14 @@ export function graphql(source: string): unknown;
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n    mutation CreateTweet($payload: CreateTweetData!) {\n        createTweet(payload : $payload){\n            id\n        }\n    }\n"): (typeof documents)["\n    mutation CreateTweet($payload: CreateTweetData!) {\n        createTweet(payload : $payload){\n            id\n        }\n    }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "#graphql\n    mutation FollowUser($to: ID!) {\n        followUser(to: $to)\n    } \n"): (typeof documents)["#graphql\n    mutation FollowUser($to: ID!) {\n        followUser(to: $to)\n    } \n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "#graphql\n    mutation UnfollowUser($to: ID!) {\n        unfollowUser(to: $to)\n    }\n"): (typeof documents)["#graphql\n    mutation UnfollowUser($to: ID!) {\n        unfollowUser(to: $to)\n    }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
