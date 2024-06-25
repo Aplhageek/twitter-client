@@ -9,9 +9,9 @@ import { graphQLClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/queries/user";
 import { Tweet, User } from "@/gql/graphql";
 import FeedCard from "@/Components/Layout/FeedCard/FeedCard";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { followUserMutation } from "@/graphql/mutation/user";
+import { followUserMutation, unfollowUserMutation } from "@/graphql/mutation/user";
 import { useQueryClient } from "@tanstack/react-query";
 
 
@@ -22,6 +22,10 @@ interface ServerProps {
 const UserProfilePage: NextPage<ServerProps> = (props) => {
   const { user } = useCurrentUser();
   const queryClient = useQueryClient();
+
+  const [isFollowBtnActive, setIsFollowBtnActive] = useState(false);
+
+
 
   const amIFollowing = useMemo(() => {
     // TODO: remove this to simple logic if even after resolving stale data of SSR is not updating 
@@ -40,17 +44,37 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
   }, [props.user, user]);
 
 
-  const handleFollowUser = useCallback( async ()=> {
-    if(!props.user) return toast.error("something went wrong");
+  const handleFollowUser = useCallback(async () => {
+    if (!props.user) return toast.error("something went wrong");
+    setIsFollowBtnActive(true);
+    try {
+      await graphQLClient.request(followUserMutation, { to: props.user.id });
+      await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+      toast.success(`You are now following ${props.user.firstName}`);
+    } catch (error) {
+      toast.error('Failed to follow user');
+    } finally {
+      setIsFollowBtnActive(false);
+    }
+  }, [props.user, queryClient]);
 
-    await graphQLClient.request(followUserMutation, {to: props.user.id});
-    await queryClient.invalidateQueries( { queryKey : ["current-user"] });
-    toast.success(`Following ${props.user.firstName} now`);
-  } ,[props.user, queryClient]); 
 
-  function handleUnfollowUser(event: Event): void {
-    toast.success("Implimentation is in progress");
-  }
+  const handleUnfollowUser = useCallback(async () => {
+    if (!props.user) return toast.error("something went wrong");
+    setIsFollowBtnActive(true);
+    try {
+      await graphQLClient.request(unfollowUserMutation, { to: props.user.id });
+      await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+      toast.success(`Unfollowed ${props.user.firstName}`);
+    } catch (error) {
+      toast.error('Failed to unfollow user');
+    } finally {
+      setIsFollowBtnActive(false);
+    }
+  }, [props.user, queryClient]);
+
+
+
 
   return (
     <TwitterLayout>
@@ -87,20 +111,25 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
           <div className="infoOfUser  text-[15px] px-3">
             <div className="logoutWrapper h-8 p-1 flex justify-end items-start mb-5">
               {user?.id === props.user.id ?
-                <button className="px-4 rounded-full border-[2px] py-[5px] border-[#536471] mt-1 hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in">
+                <button key={"logout"} className="px-4 rounded-full border-[2px] py-[5px] border-[#536471] mt-1 hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in">
                   Logout
                 </button> :
                 (
                   amIFollowing ?
                     <button
-                    // onClick={handleUnfollowUser}   
-                    className=" text-[#0F1419] bg-[#eff3f4] px-2 rounded-full border-[2px] py-[4px] mt-1 hover:scale-105 cursor-pointer transition-all duration-200 ease-in text-sm md:text-sm lg:text-base font-bold">
+                      key={"unfollow"}
+                      disabled={isFollowBtnActive}
+                      onClick={handleUnfollowUser}
+                      className=" text-[#0F1419] bg-[#eff3f4] px-2 rounded-full border-[2px] py-[4px] mt-1 hover:scale-105 cursor-pointer transition-all duration-200 ease-in text-sm md:text-sm lg:text-base font-bold">
                       Unfollow
                     </button> :
-                    <button 
-                    onClick={handleFollowUser} 
-                    className=" text-[#0F1419] bg-[#eff3f4] px-2 rounded-full border-[2px] py-[4px] mt-1 hover:scale-105 cursor-pointer transition-all duration-200 ease-in text-sm md:text-sm lg:text-base font-bold">
+                    <button
+                      key={"follow"}
+                      onClick={handleFollowUser}
+                      disabled={isFollowBtnActive}
+                      className=" text-[#0F1419] bg-[#eff3f4] px-2 rounded-full border-[2px] py-[4px] mt-1 hover:scale-105 cursor-pointer transition-all duration-200 ease-in text-sm md:text-sm lg:text-base font-bold">
                       Follow
+                      <span>s</span>
                     </button>
                 )
               }
@@ -109,7 +138,6 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
               <h2 className=" font-extrabold max-w-[50%] overflow-hidden md:text-[20px]">
                 {props.user.firstName + " " + props.user.lastName}
               </h2>
-
               <div className="followinfo text-[#8b98a7]  text-[13px] my-3">
                 <span className="hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in  px-2 py-1 rounded-full following font-bold ">
                   <span className=" text-[#E7E9EA] font-extrabold mr-1">{props.user.followings?.length}</span>{" "}
