@@ -3,12 +3,13 @@ import TwitterLayout from "@/Components/Layout/TwitterLayout/TwitterLayout";
 import type { GetServerSideProps, NextPage } from "next";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import Image from "next/image";
-import {  useGetUserById } from "@/hooks/user";
+import { useGetUserById, useCurrentUser } from "@/hooks/user";
 import { useRouter } from "next/router";
 import { graphQLClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/queries/user";
 import { Tweet, User } from "@/gql/graphql";
 import FeedCard from "@/Components/Layout/FeedCard/FeedCard";
+import { useMemo } from "react";
 
 
 interface ServerProps {
@@ -16,7 +17,24 @@ interface ServerProps {
 }
 
 const UserProfilePage: NextPage<ServerProps> = (props) => {
-  
+  const { user } = useCurrentUser();
+
+  const amIFollowing = useMemo(() => {
+    if (!user || !user.followings) return false;
+    if (!props.user || !props.user.followers) return false;
+
+    if (user?.followings?.length <= props.user?.followers?.length) {
+      // find for props.user in followings list of users
+      const index = user?.followings?.findIndex(record => record?.id === props.user?.id)
+      return index >= 0;
+    } else {
+      // find user in followers list of props.user
+      const index = props.user?.followers?.findIndex(record => record?.id === user?.id)
+      return index >= 0;
+    }
+  }, [props.user, user]);
+
+
   return (
     <TwitterLayout>
       {props.user && <div className="wrapper">
@@ -28,7 +46,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
             <h4 className="text-xl font-extrabold tracking-wide">
               {props.user.firstName + " " + props.user.lastName}
             </h4>
-            <span className="text-sm text-[#566779]">{`${props.user.tweets?.length} tweets` }</span>
+            <span className="text-sm font-bold text-[#566779]">{`${props.user.tweets?.length} tweets`}</span>
           </div>
         </div>
         <div className="profileDetails relative border-b-[1px] border-slate-700">
@@ -40,7 +58,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
 
             <div className="profileImage w-16 h-16 relative bottom-9 left-4 -mb-16 cursor-pointer md:w-24 md:h-24 md:bottom-12 md:-mb-24">
               <Image
-                src={props.user?.profileImageURL as string }
+                src={props.user?.profileImageURL as string}
                 alt={props.user?.firstName ? props.user.firstName : "user"}
                 width={1000}
                 height={1000}
@@ -51,30 +69,33 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
 
           <div className="infoOfUser  text-[15px] px-3">
             <div className="logoutWrapper h-8 p-1 flex justify-end items-start mb-5">
-              <button className=" px-2 rounded-full border py-[2px] border-[#536471] mt-1 hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in">
-                Logout
-              </button>
+              {user?.id === props.user.id ?
+                <button className="px-4 rounded-full border-[2px] py-[5px] border-[#536471] mt-1 hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in">
+                  Logout
+                </button> :
+                (
+                  amIFollowing ?
+                    <button className=" text-[#0F1419] bg-[#eff3f4] px-2 rounded-full border-[2px] py-[4px] mt-1 hover:scale-105 cursor-pointer transition-all duration-200 ease-in text-sm md:text-sm lg:text-base font-bold">
+                      Unfollow
+                    </button> :
+                    <button className=" text-[#0F1419] bg-[#eff3f4] px-2 rounded-full border-[2px] py-[4px] mt-1 hover:scale-105 cursor-pointer transition-all duration-200 ease-in text-sm md:text-sm lg:text-base font-bold">
+                      Follow
+                    </button>
+                )
+              }
             </div>
             <div className="usernameinfo md:mt-10 ">
               <h2 className=" font-extrabold max-w-[50%] overflow-hidden md:text-[20px]">
                 {props.user.firstName + " " + props.user.lastName}
               </h2>
 
-              {/* TODO: Add scalar type to query on backend to support this 
-              <div className="joininginfo text-[10px] text-[#566779] flex items-center gap-1 py-1 md:text-sm">
-                <span className="inline-flex items-center text-sm">
-                  <CgCalendarDates />
-                </span>
-                <span>{" Joined May 2024"}</span>
-              </div> */}
-
-              <div className="followinfo text-[#566779]  text-[12px] my-3">
-                <span className="hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in  px-2 py-1 rounded-full following ">
-                  <span className=" text-white font-extrabold">0</span>{" "}
+              <div className="followinfo text-[#8b98a7]  text-[13px] my-3">
+                <span className="hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in  px-2 py-1 rounded-full following font-bold ">
+                  <span className=" text-[#E7E9EA] font-extrabold mr-1">{props.user.followings?.length}</span>{" "}
                   Following
                 </span>
-                <span className="hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in px-2 py-1 rounded-full followers ml-2">
-                  <span className=" text-white font-extrabold">0</span>{" "}
+                <span className="hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in px-2 py-1 rounded-full followers ml-2 font-bold">
+                  <span className=" text-[#E7E9EA] font-extrabold mr-1">{props.user.followers?.length}</span>
                   Followers
                 </span>
               </div>
@@ -84,7 +105,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
 
         <div className="feed">
           {
-            props.user.tweets?.map((tweet)=> <FeedCard key={tweet?.id} data={tweet as Tweet} /> )
+            props.user.tweets?.map((tweet) => <FeedCard key={tweet?.id} data={tweet as Tweet} />)
           }
         </div>
       </div>}
