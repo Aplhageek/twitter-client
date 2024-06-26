@@ -76,10 +76,6 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
         },
     ], [user?.id])
 
-
-
-
-
     // Hanlders
     const handleGoogleLogin = useCallback(async (cred: CredentialResponse) => {
         try {
@@ -111,7 +107,6 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
             console.log(err);
         }
     }, [queryClient]);
-
 
     return (
         <div>
@@ -203,10 +198,3 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
 }
 
 export default TwitterLayout;
-
-
-/*
-
-
-
-*/

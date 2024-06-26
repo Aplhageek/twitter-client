@@ -56,7 +56,7 @@ const Home: React.FC<HomeProps> = (props) => {
     }
   }, []);
 
-  const validateContent = (content: string) : boolean => {
+  const validateContent = (content: string): boolean => {
     const trimmedContent = content.trim();
 
     if (!trimmedContent) {
@@ -67,7 +67,7 @@ const Home: React.FC<HomeProps> = (props) => {
     const maxContentLength = 280;
     if (trimmedContent.length > maxContentLength) {
       toast.error(`Tweet cannot exceed ${maxContentLength} characters.`);
-      return false ;
+      return false;
     }
 
     return true;
@@ -76,7 +76,7 @@ const Home: React.FC<HomeProps> = (props) => {
   const handleCreateTweet = useCallback(async (content: string) => {
     // // FIXME: Add validation to ensure the consistent behavior
 
-    if(!validateContent(content)) return;
+    if (!validateContent(content)) return;
 
     let s3ImagePath = null;
 
