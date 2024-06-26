@@ -108,7 +108,7 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
             // force refetching of data to ensure the application has the most up-to-date information.
             // to get latest data when token is changed.
             const ann = await queryClient.invalidateQueries({
-                queryKey: ["curent-user"],
+                queryKey: ["current-user"],
             });
 
             return;

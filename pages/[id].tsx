@@ -13,6 +13,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { followUserMutation, unfollowUserMutation } from "@/graphql/mutation/user";
 import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 
 
 interface ServerProps {
@@ -74,15 +75,21 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
   }, [props.user, queryClient]);
 
 
-
+  const handleLogout = useCallback(async () => {
+    localStorage.removeItem("__twitterToken");
+    await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+    toast.success(`Logout succesfully`);
+  }, [queryClient]);
 
   return (
     <TwitterLayout>
       {props.user && <div className="wrapper">
         <div className="actions flex gap-6 p-1 ">
-          <div className="backarrow rounded-full h-9 w-9 hover:bg-slate-800 flex items-center justify-center cursor-pointer ">
-            <IoMdArrowRoundBack className=" rounded-full " />
-          </div>
+          <Link href={'/'}>
+            <div className="backarrow rounded-full h-9 w-9 hover:bg-slate-800 flex items-center justify-center cursor-pointer ">
+              <IoMdArrowRoundBack className=" rounded-full " />
+            </div>
+          </Link>
           <div className="user flex flex-col ">
             <h4 className="text-xl font-extrabold tracking-wide">
               {props.user.firstName + " " + props.user.lastName}
@@ -111,7 +118,9 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
           <div className="infoOfUser  text-[15px] px-3">
             <div className="logoutWrapper h-8 p-1 flex justify-end items-start mb-5">
               {user?.id === props.user.id ?
-                <button key={"logout"} className="px-4 rounded-full border-[2px] py-[5px] border-[#536471] mt-1 hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in">
+                <button
+                  onClick={handleLogout}
+                  key={"logout"} className="px-4 rounded-full border-[2px] py-[5px] border-[#536471] mt-1 hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in">
                   Logout
                 </button> :
                 (
