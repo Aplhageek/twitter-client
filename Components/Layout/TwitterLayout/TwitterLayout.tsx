@@ -115,7 +115,6 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
 
     return (
         <div>
-            {/* FIXME: Layout shift and scrollbar */}
             <div className="grid grid-cols-12 min-h-screen max-w-screen  sm:mr-10 lg:mx-14 xl:mx-28">
                 {/* left sidebar */}
 

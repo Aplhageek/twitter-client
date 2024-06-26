@@ -33,7 +33,6 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
 
 
   const amIFollowing = useMemo(() => {
-    // TODO: remove this to simple logic if even after resolving stale data of SSR is not updating 
     if (!user || !user.followings) return false;
     if (!profileUser || !profileUser.followers) return false;
 

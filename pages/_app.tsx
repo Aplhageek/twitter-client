@@ -6,7 +6,6 @@ import type { AppProps } from "next/app";
 import { Inter } from "next/font/google";
 import { Toaster } from 'react-hot-toast';
 
-// TODO: Magic value ==> clientId 
 
 
 const inter = Inter({ subsets: ["latin"] });

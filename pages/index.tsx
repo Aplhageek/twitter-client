@@ -56,8 +56,28 @@ const Home: React.FC<HomeProps> = (props) => {
     }
   }, []);
 
+  const validateContent = (content: string) : boolean => {
+    const trimmedContent = content.trim();
+
+    if (!trimmedContent) {
+      toast.error("Tweet cannot be empty.");
+      return false;
+    }
+
+    const maxContentLength = 280;
+    if (trimmedContent.length > maxContentLength) {
+      toast.error(`Tweet cannot exceed ${maxContentLength} characters.`);
+      return false ;
+    }
+
+    return true;
+  }
+
   const handleCreateTweet = useCallback(async (content: string) => {
     // // FIXME: Add validation to ensure the consistent behavior
+
+    if(!validateContent(content)) return;
+
     let s3ImagePath = null;
 
     if (localTweetImagURL) {
@@ -137,7 +157,7 @@ const Home: React.FC<HomeProps> = (props) => {
     setLocalTweetImageURL(null);
     signedURLRef.current = null;
     inputFileRef.current = null;
-  },[]);
+  }, []);
 
 
   // TODO: Add feAT to make user public private and render feed accordingly
