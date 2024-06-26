@@ -15,6 +15,8 @@ import { PiBell } from 'react-icons/pi';
 import { RiMoneyDollarCircleFill } from 'react-icons/ri';
 import Image from "next/image";
 import Link from 'next/link';
+import Recommended from '@/Components/UI/Recommended';
+import { User } from '@/gql/graphql';
 
 interface TwitterLayoutProps {
     children: React.ReactNode
@@ -185,9 +187,20 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
 
                 {/* google login */}
 
-                <div className="hidden bg-slate-400 md:block lg:col-span-3 p-4 ml-10 h-fit">
-                    <div className="flex flex-col h-fit m-2">
-                        {!user && <GoogleLogin onSuccess={handleGoogleLogin} />}
+                <div className="hidden  md:block lg:col-span-3 p-4 ml-10 h-fit mt-5 border rounded-2xl border-slate-700">
+                    <div className="flex flex-col h-fit mx-2">
+                        {!user ?
+                            <GoogleLogin onSuccess={handleGoogleLogin} />
+                            :
+                            <div className='recommended'>
+                                <div className="title text-xl font-bold mb-6 ">Users You May Know</div>
+                                <div className="users">
+                                    {user.recommendedUsers?.filter((element): element is User => element !== null).map((element) => (
+                                        < Recommended key={element.id} user={element} />
+                                    ))}
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
 
