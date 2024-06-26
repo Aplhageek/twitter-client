@@ -3,7 +3,7 @@ import TwitterLayout from "@/Components/Layout/TwitterLayout/TwitterLayout";
 import type { GetServerSideProps, NextPage } from "next";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import Image from "next/image";
-import {  useCurrentUser } from "@/hooks/user";
+import {  useCurrentUser, useGetUserById } from "@/hooks/user";
 import {  useRouter } from "next/router";
 import { graphQLClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/queries/user";
@@ -25,6 +25,9 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
   const queryClient = useQueryClient();
   const router = useRouter(); 
 
+  const { user: profileUser = props.user  } = useGetUserById(props.user?.id as string);
+
+
   const [isFollowBtnActive, setIsFollowBtnActive] = useState(false);
 
 
@@ -32,48 +35,50 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
   const amIFollowing = useMemo(() => {
     // TODO: remove this to simple logic if even after resolving stale data of SSR is not updating 
     if (!user || !user.followings) return false;
-    if (!props.user || !props.user.followers) return false;
+    if (!profileUser || !profileUser.followers) return false;
 
-    if (user?.followings?.length <= props.user?.followers?.length) {
+    if (user?.followings?.length <= profileUser?.followers?.length) {
       // find for props.user in followings list of users
-      const index = user?.followings?.findIndex(record => record?.id === props.user?.id)
+      const index = user?.followings?.findIndex(record => record?.id === profileUser?.id)
       return index >= 0;
     } else {
       // find user in followers list of props.user
-      const index = props.user?.followers?.findIndex(record => record?.id === user?.id)
+      const index = profileUser?.followers?.findIndex(record => record?.id === user?.id)
       return index >= 0;
     }
-  }, [props.user, user]);
+  }, [profileUser, user]);
 
 
   const handleFollowUser = useCallback(async () => {
-    if (!props.user) return toast.error("something went wrong");
+    if (!profileUser) return toast.error("something went wrong");
     setIsFollowBtnActive(true);
     try {
-      await graphQLClient.request(followUserMutation, { to: props.user.id });
+      await graphQLClient.request(followUserMutation, { to: profileUser.id });
       await queryClient.invalidateQueries({ queryKey: ["current-user"] });
-      toast.success(`You are now following ${props.user.firstName}`);
+      await queryClient.invalidateQueries({ queryKey: ["user-by-id"] });
+      toast.success(`You are now following ${profileUser.firstName}`);
     } catch (error) {
       toast.error('Failed to follow user');
     } finally {
       setIsFollowBtnActive(false);
     }
-  }, [props.user, queryClient]);
+  }, [profileUser, queryClient]);
 
 
   const handleUnfollowUser = useCallback(async () => {
-    if (!props.user) return toast.error("something went wrong");
+    if (!profileUser) return toast.error("something went wrong");
     setIsFollowBtnActive(true);
     try {
-      await graphQLClient.request(unfollowUserMutation, { to: props.user.id });
+      await graphQLClient.request(unfollowUserMutation, { to: profileUser.id });
       await queryClient.invalidateQueries({ queryKey: ["current-user"] });
-      toast.success(`Unfollowed ${props.user.firstName}`);
+      await queryClient.invalidateQueries({ queryKey: ["user-by-id"] });
+      toast.success(`Unfollowed ${profileUser.firstName}`);
     } catch (error) {
       toast.error('Failed to unfollow user');
     } finally {
       setIsFollowBtnActive(false);
     }
-  }, [props.user, queryClient]);
+  }, [profileUser, queryClient]);
 
 
   const handleLogout = useCallback(async () => {
@@ -85,7 +90,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
 
   return (
     <TwitterLayout>
-      {props.user && <div className="wrapper">
+      {profileUser && <div className="wrapper">
         <div className="actions flex gap-6 p-1 ">
           <Link href={'/'}>
             <div className="backarrow rounded-full h-9 w-9 hover:bg-slate-800 flex items-center justify-center cursor-pointer ">
@@ -94,9 +99,9 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
           </Link>
           <div className="user flex flex-col ">
             <h4 className="text-xl font-extrabold tracking-wide">
-              {props.user.firstName + " " + props.user.lastName}
+              {profileUser.firstName + " " + profileUser.lastName}
             </h4>
-            <span className="text-sm font-bold text-[#566779]">{`${props.user.tweets?.length} tweets`}</span>
+            <span className="text-sm font-bold text-[#566779]">{`${profileUser.tweets?.length} tweets`}</span>
           </div>
         </div>
         <div className="profileDetails relative border-b-[1px] border-slate-700">
@@ -108,8 +113,8 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
 
             <div className="profileImage w-16 h-16 relative bottom-9 left-4 -mb-16 cursor-pointer md:w-24 md:h-24 md:bottom-12 md:-mb-24">
               <Image
-                src={props.user?.profileImageURL as string}
-                alt={props.user?.firstName ? props.user.firstName : "user"}
+                src={profileUser?.profileImageURL as string}
+                alt={profileUser?.firstName ? profileUser.firstName : "user"}
                 width={1000}
                 height={1000}
                 className="h-full w-full rounded-full object-cover border-2 border-black bg-white"
@@ -119,7 +124,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
 
           <div className="infoOfUser  text-[15px] px-3">
             <div className="logoutWrapper h-8 p-1 flex justify-end items-start mb-5">
-              {user?.id === props.user.id ?
+              {user?.id === profileUser.id ?
                 <button
                   onClick={handleLogout}
                   key={"logout"} className="px-4 rounded-full border-[2px] py-[5px] border-[#536471] mt-1 hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in">
@@ -147,15 +152,15 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
             </div>
             <div className="usernameinfo md:mt-10 ">
               <h2 className=" font-extrabold max-w-[50%] overflow-hidden md:text-[20px]">
-                {props.user.firstName + " " + props.user.lastName}
+                {profileUser.firstName + " " + profileUser.lastName}
               </h2>
               <div className="followinfo text-[#8b98a7]  text-[13px] my-3">
                 <span className="hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in  px-2 py-1 rounded-full following font-bold ">
-                  <span className=" text-[#E7E9EA] font-extrabold mr-1">{props.user.followings?.length}</span>{" "}
+                  <span className=" text-[#E7E9EA] font-extrabold mr-1">{profileUser.followings?.length}</span>{" "}
                   Following
                 </span>
                 <span className="hover:bg-gray-700 cursor-pointer transition-all duration-200 ease-in px-2 py-1 rounded-full followers ml-2 font-bold">
-                  <span className=" text-[#E7E9EA] font-extrabold mr-1">{props.user.followers?.length}</span>
+                  <span className=" text-[#E7E9EA] font-extrabold mr-1">{profileUser.followers?.length}</span>
                   Followers
                 </span>
               </div>
@@ -165,7 +170,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
 
         <div className="feed">
           {
-            props.user.tweets?.map((tweet) => <FeedCard key={tweet?.id} data={tweet as Tweet} />)
+            profileUser.tweets?.map((tweet) => <FeedCard key={tweet?.id} data={tweet as Tweet} />)
           }
         </div>
       </div>}
