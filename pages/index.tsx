@@ -64,11 +64,18 @@ const Home: React.FC<HomeProps> = (props) => {
       return false;
     }
 
+    const minContentLength = 3;
+    if (trimmedContent.length <  minContentLength ) {
+      toast.error(`Tweet cannot be less than ${minContentLength} characters.`);
+      return false;
+    }
+    
     const maxContentLength = 280;
-    if (trimmedContent.length > maxContentLength) {
+    if (trimmedContent.length > maxContentLength ) {
       toast.error(`Tweet cannot exceed ${maxContentLength} characters.`);
       return false;
     }
+    
 
     return true;
   }
