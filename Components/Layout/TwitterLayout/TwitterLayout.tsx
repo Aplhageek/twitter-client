@@ -50,6 +50,16 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
             link: "/",
         },
         {
+            title: "Bookmarks",
+            icon: <BsBookmark />,
+            link: "/",
+        },
+        {
+            title: "Profile",
+            icon: <BiUser />,
+            link: `/${user?.id}`,
+        },
+        {
             title: "Notifications",
             icon: <PiBell />,
             link: "/",
@@ -58,21 +68,6 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
             title: "Messeges",
             icon: <MdOutlineMailOutline />,
             link: "/",
-        },
-        {
-            title: "Bookmarks",
-            icon: <BsBookmark />,
-            link: "/",
-        },
-        {
-            title: "Twitter Blue",
-            icon: <RiMoneyDollarCircleFill />,
-            link: "/",
-        },
-        {
-            title: "Profile",
-            icon: <BiUser />,
-            link: `/${user?.id}`,
         },
         {
             title: "More",
@@ -125,29 +120,28 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
                 {/* left sidebar */}
 
                 <div className="col-span-2 md:col-span-3 pt-1  sm:pl-4  flex flex-col justify-between max-h-[99vh] sticky top-0">
-                    <div className="sidebarandlogo ">
-
-                        <div className="logo text-xl md:text-3xl w-fit hover:bg-gray-700 rounded-full py-2 px-2 mx-2 cursor-pointer transition-all duration-200 ease-in">
-                            <BsTwitter />
-                        </div>
-
-
-                        <div className="max-h-[68vh] md:max-h-[55vh] overflow-scroll mt-1 custom-scrollbar">
-                            {" "}
-                            {/* Adjust max-height as needed */}
-                            <ul className="text-sm xl:text-xl font-normal flex flex-col">
-                                {sidebarMenuItems.map((item) => (
-                                    <Link href={item.link} key={item.title}>
-                                        <li
-                                            className="flex justify-start items-center gap-4 hover:bg-gray-800 rounded-full cursor-pointer transition-all duration-200 ease-in px-4 py-2 md:py-3 pr-6 my-1 w-fit "
-                                            key={item.title}
-                                        >
-                                            <span className="text-2xl lg:text-3xl ">{item.icon}</span>
-                                            <span className=" hidden md:inline" >{item.title}</span>
-                                        </li>
-                                    </Link>
-                                ))}
-                            </ul>
+                    <div className="sidebarandlogo min-h-[70vh] flex flex-col justify-between ">
+                        <div className="menuitems">
+                            <div className="mb-5 logo text-xl md:text-3xl w-fit hover:bg-gray-700 rounded-full py-2 px-2 mx-2 cursor-pointer transition-all duration-200 ease-in">
+                                <BsTwitter />
+                            </div>
+                            <div className="max-h-[68vh] md:max-h-[55vh] overflow-scroll mt-1 custom-scrollbar">
+                                {" "}
+                                {/* Adjust max-height as needed */}
+                                <ul className="text-sm xl:text-xl font-normal flex flex-col">
+                                    {sidebarMenuItems.map((item) => (
+                                        <Link href={item.link} key={item.title}>
+                                            <li
+                                                className="flex justify-start items-center gap-4 hover:bg-gray-800 rounded-full cursor-pointer transition-all duration-200 ease-in px-4 py-2 md:py-3 pr-6 my-1 w-fit "
+                                                key={item.title}
+                                            >
+                                                <span className="text-2xl lg:text-3xl ">{item.icon}</span>
+                                                <span className=" hidden md:inline" >{item.title}</span>
+                                            </li>
+                                        </Link>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
 
                         <button className=" bg-[#1d9bf0] text-lg mt-5 py-3  rounded-full w-full font-semibold tracking-wide hover:bg-sky-600  transition-all duration-300 max-w-[70%] min-w-fit hidden md:block">
@@ -187,7 +181,7 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
 
                 {/* google login */}
 
-                <div className="hidden  md:block lg:col-span-3 p-4 ml-10 h-fit mt-5 border rounded-2xl border-slate-700">
+                <div className="hidden  md:block lg:col-span-3 p-4 ml-10 h-fit mt-5 border rounded-2xl border-slate-700 sticky top-5">
                     <div className="flex flex-col h-fit mx-2">
                         {!user ?
                             <GoogleLogin onSuccess={handleGoogleLogin} />

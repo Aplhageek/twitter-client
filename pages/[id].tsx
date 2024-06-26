@@ -3,8 +3,8 @@ import TwitterLayout from "@/Components/Layout/TwitterLayout/TwitterLayout";
 import type { GetServerSideProps, NextPage } from "next";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import Image from "next/image";
-import { useGetUserById, useCurrentUser } from "@/hooks/user";
-import { useRouter } from "next/router";
+import {  useCurrentUser } from "@/hooks/user";
+import {  useRouter } from "next/router";
 import { graphQLClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/queries/user";
 import { Tweet, User } from "@/gql/graphql";
@@ -23,6 +23,7 @@ interface ServerProps {
 const UserProfilePage: NextPage<ServerProps> = (props) => {
   const { user } = useCurrentUser();
   const queryClient = useQueryClient();
+  const router = useRouter(); 
 
   const [isFollowBtnActive, setIsFollowBtnActive] = useState(false);
 
@@ -79,7 +80,8 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
     localStorage.removeItem("__twitterToken");
     await queryClient.invalidateQueries({ queryKey: ["current-user"] });
     toast.success(`Logout succesfully`);
-  }, [queryClient]);
+    router.push('/');
+  }, [queryClient, router]);
 
   return (
     <TwitterLayout>
