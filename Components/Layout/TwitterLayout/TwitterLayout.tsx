@@ -57,7 +57,7 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
         {
             title: "Profile",
             icon: <BiUser />,
-            link: `/${user?.id}`,
+            link: `/${user?.id ?? ""}`,
         },
         // {
         //     title: "Notifications",

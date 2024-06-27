@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import type { AppProps } from "next/app";
 import { Inter } from "next/font/google";
+import { useState, useEffect } from "react";
 import { Toaster } from 'react-hot-toast';
 
 
@@ -13,6 +14,19 @@ const inter = Inter({ subsets: ["latin"] });
 const queryCLient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
+
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Ensure the app is hydrated before rendering
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  if (!isHydrated) {
+    // Render nothing until the client-side is hydrated
+    return null;
+  }
+  
   return (
     <div className={inter.className}>
       <QueryClientProvider client={queryCLient} >
@@ -20,7 +34,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Component {...pageProps} />
           <Toaster />
         </GoogleOAuthProvider>
-        <ReactQueryDevtools/>
+        <ReactQueryDevtools />
       </QueryClientProvider>
     </div>
   )

@@ -3,13 +3,13 @@ import TwitterLayout from "@/Components/Layout/TwitterLayout/TwitterLayout";
 import type { GetServerSideProps, NextPage } from "next";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import Image from "next/image";
-import {  useCurrentUser, useGetUserById } from "@/hooks/user";
-import {  useRouter } from "next/router";
+import { useCurrentUser, useGetUserById } from "@/hooks/user";
+import { useRouter } from "next/router";
 import { graphQLClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/queries/user";
 import { Tweet, User } from "@/gql/graphql";
 import FeedCard from "@/Components/Layout/FeedCard/FeedCard";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { followUserMutation, unfollowUserMutation } from "@/graphql/mutation/user";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,15 +17,23 @@ import Link from "next/link";
 
 
 interface ServerProps {
-  user?: User
+  user?: User | null
 }
 
 const UserProfilePage: NextPage<ServerProps> = (props) => {
+
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+
   const { user } = useCurrentUser();
   const queryClient = useQueryClient();
-  const router = useRouter(); 
+  const router = useRouter();
 
-  const { user: profileUser = props.user  } = useGetUserById(props.user?.id as string);
+  const { user: profileUser = props.user } = useGetUserById(props.user?.id as string);
 
 
   const [isFollowBtnActive, setIsFollowBtnActive] = useState(false);
@@ -86,6 +94,12 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
     toast.success(`Logout succesfully`);
     router.push('/');
   }, [queryClient, router]);
+
+
+  if (!isHydrated) {
+    return null;
+  }
+
 
   return (
     <TwitterLayout>
@@ -178,22 +192,30 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
 };
 
 
-export const getServerSideProps: GetServerSideProps<ServerProps> = async (
-  context
-) => {
-  const id = context.query.id as string | undefined;
+export const getServerSideProps: GetServerSideProps<ServerProps> = async (context) => {
+  try {
+    const id = context.query.id as string | undefined;
 
-  if (!id) return { notFound: true, props: { user: undefined } };
+    if (!id) return { notFound: true, props: { user: undefined } };
 
-  const userInfo = await graphQLClient.request(getUserByIdQuery, { id });
+    const userInfo = await graphQLClient.request(getUserByIdQuery, { id });
 
-  if (!userInfo?.getUserById) return { notFound: true };
+    if (!userInfo?.getUserById) return { notFound: true };
 
-  return {
-    props: {
-      user: userInfo.getUserById as User,
-    },
-  };
+    return {
+      props: {
+        user: userInfo.getUserById as User,
+      },
+    };
+  } catch (error) {
+    // toast.error("something went wrong");
+    return {
+      props: {
+        user: null,
+      },
+    };
+
+  }
 };
 
 export default UserProfilePage;

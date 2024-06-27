@@ -65,17 +65,17 @@ const Home: React.FC<HomeProps> = (props) => {
     }
 
     const minContentLength = 3;
-    if (trimmedContent.length <  minContentLength ) {
+    if (trimmedContent.length < minContentLength) {
       toast.error(`Tweet cannot be less than ${minContentLength} characters.`);
       return false;
     }
-    
+
     const maxContentLength = 280;
-    if (trimmedContent.length > maxContentLength ) {
+    if (trimmedContent.length > maxContentLength) {
       toast.error(`Tweet cannot exceed ${maxContentLength} characters.`);
       return false;
     }
-    
+
 
     return true;
   }
@@ -233,11 +233,20 @@ const Home: React.FC<HomeProps> = (props) => {
 
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async (context) => {
-  const allTweets = await graphQLClient.request(getAllTweetsQuery);
+  try {
+    const allTweets = await graphQLClient.request(getAllTweetsQuery);
 
-  return {
-    props: {
-      tweets: allTweets?.getAllTweets as Tweet[],
+    return {
+      props: {
+        tweets: allTweets?.getAllTweets as Tweet[],
+      }
+    }
+
+  } catch (error) {
+    return {
+      props: {
+        tweets: [],
+      }
     }
   }
 }
