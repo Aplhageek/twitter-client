@@ -49,31 +49,31 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
             icon: <LuSearch />,
             link: "/",
         },
-        {
-            title: "Bookmarks",
-            icon: <BsBookmark />,
-            link: "/",
-        },
+        // {
+        //     title: "Bookmarks",
+        //     icon: <BsBookmark />,
+        //     link: "/",
+        // },
         {
             title: "Profile",
             icon: <BiUser />,
             link: `/${user?.id}`,
         },
-        {
-            title: "Notifications",
-            icon: <PiBell />,
-            link: "/",
-        },
-        {
-            title: "Messeges",
-            icon: <MdOutlineMailOutline />,
-            link: "/",
-        },
-        {
-            title: "More",
-            icon: <CiCircleMore />,
-            link: "/",
-        },
+        // {
+        //     title: "Notifications",
+        //     icon: <PiBell />,
+        //     link: "/",
+        // },
+        // {
+        //     title: "Messeges",
+        //     icon: <MdOutlineMailOutline />,
+        //     link: "/",
+        // },
+        // {
+        //     title: "More",
+        //     icon: <CiCircleMore />,
+        //     link: "/",
+        // },
     ], [user?.id])
 
     // Hanlders

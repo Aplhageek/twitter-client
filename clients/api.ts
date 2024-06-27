@@ -1,6 +1,6 @@
 import { GraphQLClient } from "graphql-request";
 
-const clientURL = "http://localhost:8000/graphql";
+const clientURL = process.env.NEXT_PUBLIC_API_URL as string;
 const isClient = typeof window !== "undefined";
 
 const tokenLocalStorageKey = "__twitterToken";

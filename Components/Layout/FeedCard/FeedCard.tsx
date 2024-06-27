@@ -39,7 +39,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
         <p className=' font-light  text-sm overflow-hidden text-wrap mb-2 mt-3'>
           {data.content}
         </p>
-        <div className="imag">
+        <div className="imag pr-6">
          { data.imageURL && <Image src={data.imageURL} alt='img' width={1000} height={1000} className='w-full' />}
         </div>
 
