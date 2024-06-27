@@ -36,7 +36,7 @@ const FeedCard: React.FC<FeedCardProps> = ({ data }) => {
           </Link>
         </h6>
 
-        <p className=' font-light  text-sm overflow-hidden text-wrap'>
+        <p className=' font-light  text-sm overflow-hidden text-wrap mb-2 mt-3'>
           {data.content}
         </p>
         <div className="imag">
