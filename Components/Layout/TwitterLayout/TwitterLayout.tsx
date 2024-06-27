@@ -94,13 +94,15 @@ const TwitterLayout: React.FC<TwitterLayoutProps> = ({ children }) => {
             if (!verifyGoogleToken) return toast.error("Could not generate token");
 
             localStorage.setItem("__twitterToken", verifyGoogleToken);
+            await queryClient.invalidateQueries({
+                queryKey: ["current-user"],
+            });
+
             toast.success("Logged in successfully!");
 
             // force refetching of data to ensure the application has the most up-to-date information.
             // to get latest data when token is changed.
-            const ann = await queryClient.invalidateQueries({
-                queryKey: ["current-user"],
-            });
+            
 
             return;
         } catch (err) {
